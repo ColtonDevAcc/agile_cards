@@ -1,0 +1,54 @@
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:agile_cards/app/state/app/app_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+class AuthenticationRepository {
+  final controller = StreamController<AuthStream>.broadcast();
+  final storage = const FlutterSecureStorage();
+
+  Stream<AuthStream> get status async* {
+    yield AuthStream(user: null, status: AuthenticationStatus.unauthenticated);
+    yield* controller.stream;
+  }
+
+  Future<void> logIn({required String email, required String password}) async {
+    try {
+      final User? user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((value) => value.user);
+      controller.add(AuthStream(user: user, status: AuthenticationStatus.authenticated));
+    } on FirebaseAuthException catch (e) {
+      controller.add(AuthStream(user: null, status: AuthenticationStatus.unauthenticated, message: e.message));
+      Fluttertoast.showToast(msg: e.message ?? 'Error', toastLength: Toast.LENGTH_LONG, backgroundColor: Colors.red, timeInSecForIosWeb: 3);
+      log(e.toString());
+    }
+  }
+
+  Future<void> register({required String email, required String password}) async {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+      controller.add(AuthStream(user: FirebaseAuth.instance.currentUser, status: AuthenticationStatus.authenticated));
+    } on FirebaseAuthException catch (e) {
+      controller.add(AuthStream(user: null, status: AuthenticationStatus.unauthenticated, message: e.message));
+      Fluttertoast.showToast(msg: e.message ?? 'Error', toastLength: Toast.LENGTH_LONG, backgroundColor: Colors.red, timeInSecForIosWeb: 3);
+      log(e.toString());
+    }
+  }
+
+  Future<void> logOut() async {
+    FirebaseAuth.instance.signOut();
+    controller.add(AuthStream(user: null, status: AuthenticationStatus.unauthenticated));
+  }
+
+  void dispose() => controller.close();
+}
+
+class AuthStream {
+  User? user;
+  AuthenticationStatus status;
+  String? message;
+  AuthStream({required this.user, required this.status, this.message});
+}
