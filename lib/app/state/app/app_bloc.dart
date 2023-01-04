@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/repositories/authentication_repository.dart';
 import 'package:equatable/equatable.dart';
 // ignore: depend_on_referenced_packages
 import 'package:bloc/bloc.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 part 'app_event.dart';
 part 'app_state.dart';
 
@@ -16,7 +15,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   AppBloc({required this.authenticationRepository}) : super(const AppState.unknown()) {
     on<AuthenticationStatusChanged>(onAuthenticationStatusChanged);
-    authenticationStatusSubscription = authenticationRepository.status.listen((status) => add(AuthenticationStatusChanged(status)));
+    on<AuthenticationLogoutRequested>(onLogoutRequested);
+    on<AuthenticationPersistRequested>(onPersistRequested);
+    authenticationStatusSubscription = authenticationRepository.status.listen(
+      (status) => add(AuthenticationStatusChanged(status)),
+    );
   }
 
   Future<void> onAuthenticationStatusChanged(AuthenticationStatusChanged event, Emitter<AppState> emit) async {
@@ -26,7 +29,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       case AuthenticationStatus.authenticated:
         final user = event.status.user;
-        print('object');
         return emit(AppState.authenticated(user!));
 
       case AuthenticationStatus.authenticating:
@@ -42,6 +44,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   void onLogoutRequested(AuthenticationLogoutRequested event, Emitter<AppState> emit) {
     authenticationRepository.logOut();
+  }
+
+  void onPersistRequested(AuthenticationPersistRequested event, Emitter<AppState> emit) {
+    authenticationRepository.persistUser();
   }
 
   @override

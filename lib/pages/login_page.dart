@@ -46,28 +46,38 @@ class LoginPage extends StatelessWidget {
                         child: PrimaryButton(
                           title: 'Get Started',
                           onPressed: () {
-                            print('object');
                             context.read<LoginCubit>().register();
                           },
                         ),
                       ),
                     if (state.isLogin || state.isRegister)
                       Positioned(
-                        top: MediaQuery.of(context).size.height * 0.08,
+                        top: 5,
                         child: AnimatedOpacity(
                           opacity: state.isLogin || state.isRegister ? 1 : 0,
                           duration: const Duration(milliseconds: 400),
-                          child: PrimaryTextField(title: 'Password', onPressed: (v) => context.read<LoginCubit>().passwordChanged(v)),
+                          child: AutofillGroup(
+                            child: Column(
+                              children: [
+                                PrimaryTextField(
+                                  title: 'Email',
+                                  onPressed: (v) => context.read<LoginCubit>().emailChanged(v),
+                                  keyboardType: TextInputType.emailAddress,
+                                  autofillHints: const [AutofillHints.email],
+                                ),
+                                const SizedBox(height: 10),
+                                PrimaryTextField(
+                                  title: 'Password',
+                                  onPressed: (v) => context.read<LoginCubit>().passwordChanged(v),
+                                  obscureText: true,
+                                  autofillHints: const [AutofillHints.password],
+                                  keyboardType: TextInputType.visiblePassword,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    Positioned(
-                      top: 5,
-                      child: AnimatedOpacity(
-                        opacity: state.isLogin || state.isRegister ? 1 : 0,
-                        duration: const Duration(milliseconds: 400),
-                        child: PrimaryTextField(title: 'Email', onPressed: (v) => context.read<LoginCubit>().emailChanged(v)),
-                      ),
-                    ),
                     AnimatedPositioned(
                       duration: const Duration(milliseconds: 300),
                       top: state.isLogin || state.isRegister ? MediaQuery.of(context).size.height * 0.155 : MediaQuery.of(context).size.height * 0.15,
@@ -129,8 +139,20 @@ class PrimaryTextField extends StatelessWidget {
   final String? hintText;
   final String? labelText;
   final String? title;
+  final TextInputType? keyboardType;
   final Function(String)? onPressed;
-  const PrimaryTextField({super.key, this.hintText, this.labelText, this.title, required this.onPressed});
+  final Iterable<String>? autofillHints;
+  final bool? obscureText;
+  const PrimaryTextField({
+    super.key,
+    required this.onPressed,
+    this.hintText,
+    this.labelText,
+    this.title,
+    this.autofillHints,
+    this.keyboardType,
+    this.obscureText,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +160,9 @@ class PrimaryTextField extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.9,
       child: TextFormField(
         onChanged: onPressed,
+        keyboardType: keyboardType,
+        autofillHints: autofillHints,
+        obscureText: obscureText ?? false,
         decoration: InputDecoration(
           labelText: title,
           labelStyle: TextStyle(color: Theme.of(context).colorScheme.onBackground),

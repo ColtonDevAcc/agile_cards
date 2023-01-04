@@ -41,6 +41,7 @@ class _AppState extends State<App> {
             routerConfig: router?.router,
             theme: ThemeData(
               visualDensity: VisualDensity.adaptivePlatformDensity,
+              backgroundColor: const Color.fromRGBO(33, 39, 58, 1),
               colorScheme: const ColorScheme(
                 brightness: Brightness.dark,
                 primary: Color.fromRGBO(83, 119, 234, 1),
