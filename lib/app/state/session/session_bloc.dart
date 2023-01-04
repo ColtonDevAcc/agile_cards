@@ -34,9 +34,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
         name: 'test',
         description: 'description',
         owner: FirebaseAuth.instance.currentUser?.email,
-        participants: [
-          event.owner,
-        ],
+        participants: [event.owner],
       );
 
       await sessionRepository.createSession(session);

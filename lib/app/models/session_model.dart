@@ -4,20 +4,20 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'session_model.g.dart';
 
-@JsonSerializable(anyMap: true, createFieldMap: true)
+@JsonSerializable(anyMap: true, createFieldMap: true, explicitToJson: true)
 class Session extends Equatable {
   final String id;
-  final String name;
-  final String description;
+  final String? name;
+  final List<Participant>? participants;
+  final String? description;
   final String? owner;
   final String? imageUrl;
-  final List<Participant>? participants;
   final bool? isShirtSizes;
 
   const Session({
     required this.id,
-    required this.name,
-    required this.description,
+    this.name,
+    this.description,
     this.participants,
     this.owner,
     this.imageUrl,
@@ -58,7 +58,6 @@ class Session extends Equatable {
       description: '',
       imageUrl: '',
       owner: '',
-      participants: [],
       isShirtSizes: false,
     );
   }

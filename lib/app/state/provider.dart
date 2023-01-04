@@ -16,7 +16,7 @@ class StateProviders extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (context) => AuthenticationRepository()),
-        RepositoryProvider(create: (context) => SessionRepository()..listenForSessions(null)),
+        RepositoryProvider(create: (context) => SessionRepository()),
       ],
       child: MultiBlocProvider(
         providers: [

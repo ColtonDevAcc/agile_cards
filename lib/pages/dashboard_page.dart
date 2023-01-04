@@ -1,12 +1,12 @@
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
+import 'package:agile_cards/features/dashboard/widgets/atoms/agile_card_selector.dart';
 import 'package:agile_cards/features/dashboard/widgets/atoms/participant_avatar_list.dart';
 import 'package:agile_cards/widgets/atoms/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:clipboard/clipboard.dart';
-import 'package:stacked_card_carousel/stacked_card_carousel.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -54,26 +54,17 @@ class DashboardPage extends StatelessWidget {
                       BlocBuilder<SessionBloc, SessionState>(
                         builder: (context, state) {
                           return state.session.participants != null
-                              ? ParticipantAvatarList(participants: state.session.participants!)
+                              ? ParticipantAvatarList(participants: state.session.participants!, paddingOffset: 30)
                               : const SizedBox();
                         },
                       ),
                       Expanded(
-                        child: StackedCardCarousel(
-                          spaceBetweenItems: 200,
-                          items: [
-                            for (final shirt in tShirtSizes)
-                              Card(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                elevation: 4,
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: 200,
-                                  height: 200,
-                                  child: Text(shirt),
-                                ),
-                              ),
-                          ],
+                        child: BlocBuilder<SessionBloc, SessionState>(
+                          builder: (context, state) {
+                            final bool isOwner = context.read<SessionBloc>().state.session.owner == context.read<AppBloc>().state.user?.id;
+
+                            return isOwner ? SizedBox.fromSize() : AgileCardSelector();
+                          },
                         ),
                       ),
                     ],
