@@ -15,7 +15,13 @@ part 'session_state.dart';
 class SessionBloc extends Bloc<SessionEvent, SessionState> {
   final SessionRepository sessionRepository;
   late StreamSubscription sessionSubscription;
-  SessionBloc({required this.sessionRepository}) : super(SessionState(session: Session.empty())) {
+  SessionBloc({required this.sessionRepository})
+      : super(
+          SessionState(
+            session: Session.empty(),
+            cardSelection: const [],
+          ),
+        ) {
     on<SessionStarted>(_onSessionStarted);
     on<SessionCreated>(_onSessionCreated);
     on<SessionUpdated>(_onSessionUpdated);

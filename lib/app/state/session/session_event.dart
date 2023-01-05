@@ -32,9 +32,6 @@ class SessionUpdated extends SessionEvent {
 
   @override
   List<Object> get props => [session];
-
-  @override
-  String toString() => 'SessionUpdated { session: $session }';
 }
 
 class SessionDeleted extends SessionEvent {
@@ -44,9 +41,6 @@ class SessionDeleted extends SessionEvent {
 
   @override
   List<Object> get props => [session];
-
-  @override
-  String toString() => 'SessionDeleted { session: $session }';
 }
 
 class SessionLoaded extends SessionEvent {
@@ -56,9 +50,6 @@ class SessionLoaded extends SessionEvent {
 
   @override
   List<Object> get props => [sessions];
-
-  @override
-  String toString() => 'SessionLoaded { sessions: $sessions }';
 }
 
 class SessionJoined extends SessionEvent {
@@ -67,9 +58,6 @@ class SessionJoined extends SessionEvent {
 
   @override
   List<Object> get props => [id];
-
-  @override
-  String toString() => 'SessionJoined { session: $id }';
 }
 
 class SessionChanged extends SessionEvent {
@@ -79,7 +67,12 @@ class SessionChanged extends SessionEvent {
 
   @override
   List<Object> get props => [session];
+}
+
+class SessionAgileCardSelected extends SessionEvent {
+  final double value;
+  const SessionAgileCardSelected(this.value);
 
   @override
-  String toString() => 'SessionChanged { session: $session }';
+  List<Object> get props => [value];
 }

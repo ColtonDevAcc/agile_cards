@@ -1,4 +1,4 @@
-package com.voostack.agileCards
+package  com.voostack.agilecardssprintplanning
 
 import io.flutter.embedding.android.FlutterActivity
 

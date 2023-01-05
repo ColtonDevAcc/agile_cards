@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
@@ -30,7 +32,9 @@ class DashboardPage extends StatelessWidget {
       ),
       appBar: AppBar(
         leading: const SearchButton(),
-        actions: const [UserAvatar()],
+        actions: const [
+          UserAvatar(),
+        ],
         title: BlocBuilder<SessionBloc, SessionState>(
           builder: (context, state) {
             return GestureDetector(
@@ -49,7 +53,7 @@ class DashboardPage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 50),
                   child: Center(child: Text('No session')),
                 )
-              else if (state.session.owner! == context.read<AppBloc>().state.user?.id)
+              else if (state.session.owner! != context.read<AppBloc>().state.user?.id)
                 Expanded(
                   child: Column(
                     children: [
@@ -64,6 +68,7 @@ class DashboardPage extends StatelessWidget {
                         child: BlocBuilder<SessionBloc, SessionState>(
                           builder: (context, state) {
                             final bool isOwner = context.read<SessionBloc>().state.session.owner == context.read<AppBloc>().state.user?.id;
+                            log('isOwner: $isOwner');
 
                             return isOwner ? SizedBox.fromSize() : const AgileCardSelector();
                           },

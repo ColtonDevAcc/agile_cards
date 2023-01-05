@@ -67,7 +67,7 @@ class DefaultFirebaseOptions {
     projectId: 'agilecards-da16f',
     storageBucket: 'agilecards-da16f.appspot.com',
     iosClientId: '964978059660-u2n4oct5l7msar3pup8rv6avch9nusdk.apps.googleusercontent.com',
-    iosBundleId: 'com.voostack.agileCards',
+    iosBundleId: ' com.voostack.agilecardssprintplanning',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -77,6 +77,6 @@ class DefaultFirebaseOptions {
     projectId: 'agilecards-da16f',
     storageBucket: 'agilecards-da16f.appspot.com',
     iosClientId: '964978059660-cibv0anqgiqs253u1meap4p565552gb3.apps.googleusercontent.com',
-    iosBundleId: 'com.voostack.agileCards',
+    iosBundleId: ' com.voostack.agilecardssprintplanning',
   );
 }

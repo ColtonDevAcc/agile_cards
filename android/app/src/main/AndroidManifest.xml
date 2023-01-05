@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.voostack.agileCards">
+    package=" com.voostack.agilecardssprintplanning">
     <application
         android:label="agile_cards"
         android:name="${applicationName}"

@@ -84,8 +84,8 @@ class SessionRepository {
     final data = sessionResult.value as Map<dynamic, dynamic>;
     final Session session = Session.fromJson(Map<String, dynamic>.from(data));
 
-    if (user.uid != session.owner) {
-      log('returning you to the session');
+    if (user.uid == session.owner) {
+      log('returning you to the session as the owner');
       return;
     }
 
@@ -95,11 +95,21 @@ class SessionRepository {
     }
 
     for (final participant in session.participants ?? []) {
-      if (participant.id == user) {
-        log('you are already in the session');
+      if (participant.id == user.uid) {
+        log('returning you to the session as a participant');
+        subscribeToSession(sessionRef);
         return;
       }
     }
+
+    final updatedSession = session.copyWith(
+      participants: [
+        ...session.participants ?? [],
+        Participant.fromUser(user),
+      ],
+    );
+
+    await sessionRef.update(updatedSession.toJson());
 
     subscribeToSession(sessionRef);
   }

@@ -3,6 +3,7 @@ import 'package:agile_cards/app/services/refresh_stream.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/pages/dashboard_page.dart';
 import 'package:agile_cards/pages/login_page.dart';
+import 'package:agile_cards/pages/profile_page.dart';
 import 'package:agile_cards/pages/registration_page.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
@@ -37,6 +38,14 @@ class AppRouter {
       GoRoute(
         path: '/dashboard',
         builder: (context, state) => const DashboardPage(),
+        routes: [
+          GoRoute(
+            parentNavigatorKey: navigatorKey,
+            path: 'profile',
+            name: 'profile_page',
+            builder: (context, state) => const ProfilePage(),
+          ),
+        ],
       ),
     ],
     redirect: (context, state) {
