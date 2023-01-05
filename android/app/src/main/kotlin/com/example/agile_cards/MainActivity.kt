@@ -1,4 +1,4 @@
-package ccom.voostack.agileCards
+package com.voostack.agileCards
 
 import io.flutter.embedding.android.FlutterActivity
 
