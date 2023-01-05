@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'participant_model.g.dart';
 
-@JsonSerializable(anyMap: true, createFieldMap: true, explicitToJson: true)
+@JsonSerializable(anyMap: true, createFieldMap: true)
 class Participant extends Equatable {
   final String id;
   final String email;
@@ -70,10 +70,5 @@ class Participant extends Equatable {
       email: '',
       phone: '',
     );
-  }
-
-  @override
-  String toString() {
-    return 'Participant(id: $id, name: $name, imageUrl: $imageUrl, email: $email, phone: $phone, shirtSize: $shirtSize, session: $session)';
   }
 }

@@ -70,9 +70,9 @@ class SessionChanged extends SessionEvent {
 }
 
 class SessionAgileCardSelected extends SessionEvent {
-  final double value;
-  const SessionAgileCardSelected(this.value);
+  final Selection selection;
+  const SessionAgileCardSelected(this.selection);
 
   @override
-  List<Object> get props => [value];
+  List<Object> get props => [selection];
 }

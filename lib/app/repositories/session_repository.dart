@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:agile_cards/app/models/participant_model.dart';
+import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -24,6 +25,7 @@ class SessionRepository {
             final data = Map<String, dynamic>.from(event.snapshot.value as Map<dynamic, dynamic>);
             log('something new changed');
             controller.add(SessionStream(stream: Session.fromJson(data)));
+            ref = dbRef;
           }
         },
       );
@@ -36,6 +38,7 @@ class SessionRepository {
           controller.add(SessionStream(stream: Session.fromJson(data)));
         }
       });
+      ref = dbRef!;
     }
   }
 
@@ -49,7 +52,7 @@ class SessionRepository {
 
     if (session.snapshot.value != null) {
       // ignore: cast_nullable_to_non_nullable
-      final data = Map<String, dynamic>.from(session.snapshot.value as Map<dynamic, dynamic>);
+      final data = Map<String, dynamic>.from(session.snapshot.value as Map);
       final Session sessionResult = Session.fromJson(data);
       log('session found $sessionResult');
       return sessionResult;
@@ -94,7 +97,8 @@ class SessionRepository {
       return;
     }
 
-    for (final participant in session.participants ?? []) {
+    for (final p in session.participants ?? []) {
+      final participant = p as Participant;
       if (participant.id == user.uid) {
         log('returning you to the session as a participant');
         subscribeToSession(sessionRef);
@@ -112,6 +116,14 @@ class SessionRepository {
     await sessionRef.update(updatedSession.toJson());
 
     subscribeToSession(sessionRef);
+  }
+
+  Future<void> agileCardSelected(Selection selection) async {
+    final push = ref.child('selections').push();
+    await push
+        .set(selection.toJson())
+        .onError((error, stackTrace) => log('error adding card selection $error'))
+        .whenComplete(() => log('added selection'));
   }
 }
 

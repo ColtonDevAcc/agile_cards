@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:agile_cards/app/models/participant_model.dart';
+import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -30,6 +31,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<SessionJoined>(_onSessionJoined);
     on<SessionChanged>(_onSessionChanged);
     on<SessionSearched>(_onSessionSearched);
+    on<SessionAgileCardSelected>(_onSessionAgileCardSelected);
     sessionSubscription = sessionRepository.status.listen((status) => add(SessionChanged(status)));
   }
 
@@ -76,6 +78,10 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   Future<void> _onSessionSearched(SessionSearched event, Emitter<SessionState> emit) async {
     final sessions = await sessionRepository.searchForSession(event.query);
     emit(state.copyWith(sessionSearch: sessions ?? Session.empty()));
+  }
+
+  Future<void> _onSessionAgileCardSelected(SessionAgileCardSelected event, Emitter<SessionState> emit) async {
+    await sessionRepository.agileCardSelected(event.selection);
   }
 
   @override

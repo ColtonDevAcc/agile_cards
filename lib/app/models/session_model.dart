@@ -1,10 +1,11 @@
 import 'package:agile_cards/app/models/participant_model.dart';
+import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'session_model.g.dart';
 
-@JsonSerializable(anyMap: true, createFieldMap: true, explicitToJson: true)
+@JsonSerializable(anyMap: true, createFieldMap: true)
 class Session extends Equatable {
   final String id;
   final String? name;
@@ -13,9 +14,11 @@ class Session extends Equatable {
   final String? owner;
   final String? imageUrl;
   final bool? isShirtSizes;
+  final List<Selection>? selections;
 
   const Session({
     required this.id,
+    this.selections,
     this.name,
     this.description,
     this.participants,
@@ -25,7 +28,7 @@ class Session extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, name, description, imageUrl, owner, participants, isShirtSizes];
+  List<Object?> get props => [id, name, description, imageUrl, owner, participants, isShirtSizes, selections];
 
   Session copyWith({
     String? id,
@@ -33,8 +36,9 @@ class Session extends Equatable {
     String? description,
     String? imageUrl,
     String? owner,
-    List<Participant>? participants,
     bool? isShirtSizes,
+    List<Participant>? participants,
+    List<Selection>? selections,
   }) {
     return Session(
       id: id ?? this.id,
@@ -44,6 +48,7 @@ class Session extends Equatable {
       owner: owner ?? this.owner,
       participants: participants ?? this.participants,
       isShirtSizes: isShirtSizes ?? this.isShirtSizes,
+      selections: selections ?? this.selections,
     );
   }
 
@@ -59,6 +64,8 @@ class Session extends Equatable {
       imageUrl: '',
       owner: '',
       isShirtSizes: false,
+      selections: [],
+      participants: [],
     );
   }
 }
