@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class SessionRepository {
-  DatabaseReference ref = FirebaseDatabase.instance.ref("sessions/${FirebaseAuth.instance.currentUser!.uid}}");
+  DatabaseReference ref = FirebaseDatabase.instance.ref("sessions/${FirebaseAuth.instance.currentUser!.uid}");
 
-//user Session stream and ref
   final controller = StreamController<SessionStream>.broadcast();
 
   Stream<SessionStream> get status async* {
@@ -15,7 +15,7 @@ class SessionRepository {
     yield* controller.stream;
   }
 
-  void listenForSessions(DatabaseReference? dbRef) {
+  void subscribeToSession(DatabaseReference? dbRef) {
     if (dbRef != null) {
       dbRef.onValue.listen(
         (event) {
@@ -39,29 +39,69 @@ class SessionRepository {
     }
   }
 
-  Future<List<Session>> getSessions() async {
-    return [];
+  Future<Session?> searchForSession(String query) async {
+    if (query.isEmpty) {
+      log('query is empty');
+      return null;
+    }
+    final sessionRef = FirebaseDatabase.instance.ref('sessions/$query');
+    final DatabaseEvent session = await sessionRef.once();
+
+    if (session.snapshot.value != null) {
+      // ignore: cast_nullable_to_non_nullable
+      final data = Map<String, dynamic>.from(session.snapshot.value as Map<dynamic, dynamic>);
+      final Session sessionResult = Session.fromJson(data);
+      log('session found $sessionResult');
+      return sessionResult;
+    } else {
+      log('no session found');
+    }
+
+    return null;
   }
 
   Future<void> createSession(Session session) async {
     final String? uid = FirebaseAuth.instance.currentUser?.uid;
     final updatedSession = session.copyWith(id: uid, owner: uid);
     await ref
-        .child('$uid')
         .set(updatedSession.toJson())
         .onError((error, stackTrace) => log('error creating session: $error'))
         .whenComplete(() => log('session created'));
 
-    listenForSessions(ref.child('$uid'));
+    subscribeToSession(ref);
   }
 
   Future<void> updateSession(Session session) async {
     await ref.update(session.toJson());
   }
 
-  Future<Stream<DatabaseEvent>> joinSession(Session session) async {
-    await ref.update(session.toJson());
-    return ref.onValue;
+  Future<void> joinSession(String sessionId) async {
+    final sessionRef = FirebaseDatabase.instance.ref('sessions/$sessionId');
+    final sessionResult = await sessionRef.get();
+
+    final User user = FirebaseAuth.instance.currentUser!;
+    // ignore: cast_nullable_to_non_nullable
+    final data = sessionResult.value as Map<dynamic, dynamic>;
+    final Session session = Session.fromJson(Map<String, dynamic>.from(data));
+
+    if (user.uid != session.owner) {
+      log('returning you to the session');
+      return;
+    }
+
+    if (session.participants == null || session.participants!.isEmpty) {
+      subscribeToSession(sessionRef);
+      return;
+    }
+
+    for (final participant in session.participants ?? []) {
+      if (participant.id == user) {
+        log('you are already in the session');
+        return;
+      }
+    }
+
+    subscribeToSession(sessionRef);
   }
 }
 

@@ -61,6 +61,17 @@ class Participant extends Equatable {
     );
   }
 
+  //empty factory
+  factory Participant.empty() {
+    return const Participant(
+      id: '',
+      name: '',
+      imageUrl: '',
+      email: '',
+      phone: '',
+    );
+  }
+
   @override
   String toString() {
     return 'Participant(id: $id, name: $name, imageUrl: $imageUrl, email: $email, phone: $phone, shirtSize: $shirtSize, session: $session)';

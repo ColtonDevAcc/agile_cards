@@ -1,6 +1,7 @@
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
+import 'package:agile_cards/features/dashboard/widgets/molecules/session_search.dart';
 import 'package:agile_cards/features/dashboard/widgets/atoms/agile_card_selector.dart';
 import 'package:agile_cards/features/dashboard/widgets/atoms/participant_avatar_list.dart';
 import 'package:agile_cards/widgets/atoms/user_avatar.dart';
@@ -14,24 +15,22 @@ class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.read<SessionBloc>().add(SessionCreated(context.read<AppBloc>().state.user!)),
-        child: const Icon(Icons.add),
+      floatingActionButton: BlocBuilder<SessionBloc, SessionState>(
+        builder: (context, state) {
+          final isOwner = state.session.owner == context.read<AppBloc>().state.user?.id;
+          final isEmpty = state.session == Session.empty();
+
+          return isEmpty || isOwner
+              ? FloatingActionButton(
+                  onPressed: () => isEmpty ? context.read<SessionBloc>().add(SessionCreated(context.read<AppBloc>().state.user!)) : {},
+                  child: isOwner ? const Icon(Icons.send) : const Icon(Icons.add),
+                )
+              : const SizedBox();
+        },
       ),
       appBar: AppBar(
-        leading: BlocBuilder<SessionBloc, SessionState>(
-          builder: (context, state) {
-            return IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                context.read<SessionBloc>().add(SessionUpdated(session: state.session.copyWith(description: 'updated')));
-              },
-            );
-          },
-        ),
-        actions: const [
-          UserAvatar(),
-        ],
+        leading: const SearchButton(),
+        actions: const [UserAvatar()],
         title: BlocBuilder<SessionBloc, SessionState>(
           builder: (context, state) {
             return GestureDetector(
@@ -46,7 +45,10 @@ class DashboardPage extends StatelessWidget {
           return Column(
             children: [
               if (state.session == Session.empty())
-                const Center(child: Text('No session'))
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 50),
+                  child: Center(child: Text('No session')),
+                )
               else if (state.session.owner! == context.read<AppBloc>().state.user?.id)
                 Expanded(
                   child: Column(
@@ -63,7 +65,7 @@ class DashboardPage extends StatelessWidget {
                           builder: (context, state) {
                             final bool isOwner = context.read<SessionBloc>().state.session.owner == context.read<AppBloc>().state.user?.id;
 
-                            return isOwner ? SizedBox.fromSize() : AgileCardSelector();
+                            return isOwner ? SizedBox.fromSize() : const AgileCardSelector();
                           },
                         ),
                       ),
