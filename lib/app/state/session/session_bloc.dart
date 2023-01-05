@@ -4,10 +4,10 @@ import 'dart:developer';
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
-// ignore: depend_on_referenced_packages
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+// ignore: depend_on_referenced_packages
+import 'package:bloc/bloc.dart';
 
 part 'session_event.dart';
 part 'session_state.dart';
@@ -23,7 +23,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<SessionLoaded>(_onSessionLoaded);
     on<SessionJoined>(_onSessionJoined);
     on<SessionChanged>(_onSessionChanged);
-
+    on<SessionSearched>(_onSessionSearched);
     sessionSubscription = sessionRepository.status.listen((status) => add(SessionChanged(status)));
   }
 
@@ -60,13 +60,16 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   Future<void> _onSessionLoaded(SessionLoaded event, Emitter<SessionState> emit) async {}
 
   Future<void> _onSessionJoined(SessionJoined event, Emitter<SessionState> emit) async {
-    // await sessionRepository.joinSession(event.session);
-    // final sessions = await sessionRepository.getSessions();
-    // emit(SessionState(sessions: sessions));
+    sessionRepository.joinSession(event.id);
   }
 
   Future<void> _onSessionChanged(SessionChanged event, Emitter<SessionState> emit) async {
     emit(state.copyWith(session: event.session.stream ?? Session.empty()));
+  }
+
+  Future<void> _onSessionSearched(SessionSearched event, Emitter<SessionState> emit) async {
+    final sessions = await sessionRepository.searchForSession(event.query);
+    emit(state.copyWith(sessionSearch: sessions ?? Session.empty()));
   }
 
   @override

@@ -17,6 +17,14 @@ class SessionCreated extends SessionEvent {
   List<Object> get props => [owner];
 }
 
+class SessionSearched extends SessionEvent {
+  final String query;
+  const SessionSearched(this.query);
+
+  @override
+  List<Object> get props => [query];
+}
+
 class SessionUpdated extends SessionEvent {
   final Session session;
 

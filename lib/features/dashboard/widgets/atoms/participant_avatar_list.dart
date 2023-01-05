@@ -17,7 +17,6 @@ class ParticipantAvatarList extends StatelessWidget {
     part.add(participants.first);
     part.add(participants.first);
     part.add(participants.first);
-    int index = 0;
 
     final Size size = MediaQuery.of(context).size;
     return Padding(
