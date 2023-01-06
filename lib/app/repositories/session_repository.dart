@@ -124,22 +124,44 @@ class SessionRepository {
     final Object? data = await ref.get().then((value) => value.child('selections').value);
     final sessionSelection = selection.toJson();
     final User user = FirebaseAuth.instance.currentUser!;
+
     final int length = data == null ? 0 : (data as List).length;
 
-    //make sure user has not already selected a card and if so update it and make sure their are no gaps to the list such as 0,1,3,4
-    int i = 0;
+    // get length and check for missing item in list such as 0,1,2,4,5
+    // final int missingInList = List.from(data as List).fold(0, (previousValue, element) {
+    //   final int index = (element as Map).keys.first as int;
+    //   if (previousValue == index) {
+    //     return previousValue + 1;
+    //   } else {
+    //     return previousValue;
+    //   }
+    // });
+
+    // log('missingInList $missingInList');
+
+    int b = 0;
+    int a = 0;
     if (data != null) {
       for (final s in data as List) {
-        i++;
+        b++;
         final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
         if (selection.userId == user.uid) {
           await ref
-              .child('$i')
+              .child('$a')
+              .set(sessionSelection)
+              .onError((error, stackTrace) => log('error updating card selection $error'))
+              .whenComplete(() => log('updated selection'));
+          return;
+        } else if (a - b != 1 && b != 0) {
+          log("missing item in list $b");
+          await ref
+              .child('$b')
               .set(sessionSelection)
               .onError((error, stackTrace) => log('error updating card selection $error'))
               .whenComplete(() => log('updated selection'));
           return;
         }
+        a++;
       }
     }
 
