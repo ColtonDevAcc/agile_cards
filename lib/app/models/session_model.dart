@@ -2,9 +2,10 @@ import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+
 part 'session_model.g.dart';
 
-@JsonSerializable(anyMap: true, createFieldMap: true, explicitToJson: true)
+@JsonSerializable(anyMap: true, createFieldMap: true)
 class Session extends Equatable {
   final String id;
   final String? name;

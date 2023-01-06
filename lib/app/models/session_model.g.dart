@@ -36,10 +36,10 @@ const _$SessionFieldMap = <String, String>{
 Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
-      'participants': instance.participants?.map((e) => e.toJson()).toList(),
+      'participants': instance.participants,
       'description': instance.description,
       'owner': instance.owner,
       'imageUrl': instance.imageUrl,
       'isShirtSizes': instance.isShirtSizes,
-      'selections': instance.selections?.map((e) => e.toJson()).toList(),
+      'selections': instance.selections,
     };

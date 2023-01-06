@@ -21,12 +21,6 @@ class ProfilePage extends StatelessWidget {
             Text(user?.email ?? ''),
             const SizedBox(height: 20),
             Text(user?.id ?? ''),
-            Center(
-              child: TextButton(
-                onPressed: () => context.read<AppBloc>().add(AuthenticationLogoutRequested()),
-                child: const Text('logout'),
-              ),
-            ),
           ],
         ),
       ),

@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'selection_model.g.dart';
 
-@JsonSerializable(anyMap: true, createFieldMap: true, explicitToJson: true)
+@JsonSerializable(anyMap: true, createFieldMap: true)
 class Selection extends Equatable {
   final String userId;
   final int cardSelected;
