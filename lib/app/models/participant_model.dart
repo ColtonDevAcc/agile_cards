@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'participant_model.g.dart';
 
-@JsonSerializable(anyMap: true, createFieldMap: true)
+@JsonSerializable(anyMap: true, createFieldMap: true, explicitToJson: true)
 class Participant extends Equatable {
   final String id;
   final String email;

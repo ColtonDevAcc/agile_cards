@@ -65,10 +65,10 @@ class SessionRepository {
 
   Future<void> createSession(Session session) async {
     final String? uid = FirebaseAuth.instance.currentUser?.uid;
-    final updatedSession = session.copyWith(id: uid, owner: uid);
+    final updatedSession = session.copyWith(id: uid, owner: uid, selections: []);
     await ref
         .set(updatedSession.toJson())
-        .onError((error, stackTrace) => log('error creating session: $error'))
+        .onError((error, stackTrace) => log('error creating session: $error $stackTrace'))
         .whenComplete(() => log('session created'));
 
     subscribeToSession(ref);
@@ -119,11 +119,42 @@ class SessionRepository {
   }
 
   Future<void> agileCardSelected(Selection selection) async {
-    final push = ref.child('selections').push();
-    await push
-        .set(selection.toJson())
-        .onError((error, stackTrace) => log('error adding card selection $error'))
-        .whenComplete(() => log('added selection'));
+    final ref = this.ref.child('selections');
+    final Object? data = await ref.get().then((value) => value.child('selections').value);
+    final sessionSelection = selection.toJson();
+    final User user = FirebaseAuth.instance.currentUser!;
+    final int length = data == null ? 0 : (data as List).length;
+
+    //make sure user has not already selected a card and if so update it
+    int i = 0;
+    if (data != null) {
+      for (final s in data as List) {
+        i++;
+        final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
+        if (selection.userId == user.uid) {
+          log('updating selection');
+          await ref
+              .child('${i - 1}')
+              .update(sessionSelection)
+              .onError((error, stackTrace) => log('error updating card selection $error'))
+              .whenComplete(() => log('updated selection'));
+          return;
+        }
+      }
+    }
+
+    if (data == null || length == 0) {
+      await ref
+          .set([sessionSelection])
+          .onError((error, stackTrace) => log('error adding card selection $error'))
+          .whenComplete(() => log('added first selection'));
+    } else {
+      await ref
+          .child('$length')
+          .set(sessionSelection)
+          .onError((error, stackTrace) => log('error adding card selection $error'))
+          .whenComplete(() => log('added selection'));
+    }
   }
 }
 
