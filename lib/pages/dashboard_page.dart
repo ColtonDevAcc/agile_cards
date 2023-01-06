@@ -67,15 +67,25 @@ class DashboardPage extends StatelessWidget {
                       Expanded(
                         child: BlocBuilder<SessionBloc, SessionState>(
                           builder: (context, state) {
-                            final bool isOwner = context.read<SessionBloc>().state.session.owner == context.read<AppBloc>().state.user?.id;
-                            log('isOwner: $isOwner');
-
-                            return isOwner ? SizedBox.fromSize() : const AgileCardSelector();
+                            return const AgileCardSelector();
                           },
                         ),
                       ),
                     ],
                   ),
+                )
+              else
+                Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    const Center(child: Text('Selected')),
+                    const SizedBox(height: 20),
+                    Wrap(
+                      children: [
+                        for (final selection in state.session.selections ?? []) AgileCard(shirt: tShirtSizes[selection.cardSelected]),
+                      ],
+                    ),
+                  ],
                 )
             ],
           );
