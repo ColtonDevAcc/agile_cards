@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:ffi';
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
@@ -119,11 +120,64 @@ class SessionRepository {
   }
 
   Future<void> agileCardSelected(Selection selection) async {
-    final push = ref.child('selections').push();
-    await push
-        .set(selection.toJson())
-        .onError((error, stackTrace) => log('error adding card selection $error'))
-        .whenComplete(() => log('added selection'));
+    final ref = this.ref.child('selections');
+    final Object? data = await ref.get().then((value) => value.child('selections').value);
+    final sessionSelection = selection.toJson();
+    final User user = FirebaseAuth.instance.currentUser!;
+    final int length = data == null ? 0 : (data as List).length;
+
+    //make sure user has not already selected a card and if so update it and make sure their are no gaps to the list such as 0,1,3,4
+    int i = 0;
+    if (data != null) {
+      for (final s in data as List) {
+        i++;
+        final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
+        if (selection.userId == user.uid) {
+          await ref
+              .child('$i')
+              .set(sessionSelection)
+              .onError((error, stackTrace) => log('error updating card selection $error'))
+              .whenComplete(() => log('updated selection'));
+          return;
+        }
+      }
+    }
+
+    if (data == null || length == 0) {
+      await ref
+          .set([sessionSelection])
+          .onError((error, stackTrace) => log('error adding card selection $error'))
+          .whenComplete(() => log('added first selection'));
+    } else {
+      await ref
+          .child('$length')
+          .set(sessionSelection)
+          .onError((error, stackTrace) => log('error adding card selection $error'))
+          .whenComplete(() => log('added selection'));
+    }
+  }
+
+  Future<void> agileCardDeselected() async {
+    final ref = this.ref.child('selections');
+    final Object? data = await ref.get().then((value) => value.child('selections').value);
+    final User user = FirebaseAuth.instance.currentUser!;
+
+    if (data != null) {
+      int i = 0;
+      for (final s in data as List) {
+        i++;
+        final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
+        if (selection.userId == user.uid) {
+          log('removing selection');
+          await ref
+              .child('${i - 1}')
+              .remove()
+              .onError((error, stackTrace) => log('error removing card selection $error'))
+              .whenComplete(() => log('removed selection'));
+          return;
+        }
+      }
+    }
   }
 }
 

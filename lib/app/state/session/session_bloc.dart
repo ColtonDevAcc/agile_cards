@@ -32,6 +32,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<SessionChanged>(_onSessionChanged);
     on<SessionSearched>(_onSessionSearched);
     on<SessionAgileCardSelected>(_onSessionAgileCardSelected);
+    on<SessionAgileCardDeselected>(_onSessionAgileCardDeselected);
     sessionSubscription = sessionRepository.status.listen((status) => add(SessionChanged(status)));
   }
 
@@ -82,6 +83,10 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
 
   Future<void> _onSessionAgileCardSelected(SessionAgileCardSelected event, Emitter<SessionState> emit) async {
     await sessionRepository.agileCardSelected(event.selection);
+  }
+
+  Future<void> _onSessionAgileCardDeselected(SessionAgileCardDeselected event, Emitter<SessionState> emit) async {
+    await sessionRepository.agileCardDeselected();
   }
 
   @override
