@@ -219,6 +219,14 @@ class SessionRepository {
       }
     }
   }
+
+  Future<void> updateSessionName({required String name}) async {
+    await ref.update({'name': name});
+  }
+
+  Future<void> updateSessionDescription({required String description}) async {
+    await ref.update({'description': description});
+  }
 }
 
 class SessionStream {

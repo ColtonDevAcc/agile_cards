@@ -90,3 +90,19 @@ class SessionAgileCardDeselected extends SessionEvent {
   @override
   List<Object> get props => [];
 }
+
+class SessionNameChanged extends SessionEvent {
+  final String name;
+  const SessionNameChanged(this.name);
+
+  @override
+  List<Object> get props => [name];
+}
+
+class SessionDescriptionChanged extends SessionEvent {
+  final String description;
+  const SessionDescriptionChanged(this.description);
+
+  @override
+  List<Object> get props => [description];
+}

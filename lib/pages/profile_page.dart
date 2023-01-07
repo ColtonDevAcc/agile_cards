@@ -14,7 +14,7 @@ class ProfilePage extends StatelessWidget {
         title: Text(user?.email ?? ''),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -22,16 +22,12 @@ class ProfilePage extends StatelessWidget {
             Text(user?.email ?? ''),
             const SizedBox(height: 20),
             Text(user?.id ?? ''),
-            Center(
-              child: TextButton(
-                onPressed: () => context.read<AppBloc>().add(AuthenticationLogoutRequested()),
-                child: const Text('logout'),
-              ),
-            ),
-            Center(
-              child: TextButton(
-                onPressed: () => context.read<SessionBloc>().add(const SessionLeave()),
-                child: const Text('Leave Session'),
+            const Spacer(),
+            SafeArea(
+              child: ListTile(
+                title: const Text('logout'),
+                trailing: const Icon(Icons.exit_to_app),
+                onTap: () => context.read<AppBloc>().add(AuthenticationLogoutRequested()),
               ),
             ),
           ],

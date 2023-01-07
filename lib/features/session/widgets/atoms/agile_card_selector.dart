@@ -4,7 +4,7 @@ import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
-import 'package:agile_cards/pages/dashboard_page.dart';
+import 'package:agile_cards/pages/session_page.dart';
 import 'package:agile_cards/widgets/atoms/participant_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
