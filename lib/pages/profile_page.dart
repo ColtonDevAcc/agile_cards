@@ -1,4 +1,5 @@
 import 'package:agile_cards/app/state/app/app_bloc.dart';
+import 'package:agile_cards/app/state/session/session_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,6 +26,12 @@ class ProfilePage extends StatelessWidget {
               child: TextButton(
                 onPressed: () => context.read<AppBloc>().add(AuthenticationLogoutRequested()),
                 child: const Text('logout'),
+              ),
+            ),
+            Center(
+              child: TextButton(
+                onPressed: () => context.read<SessionBloc>().add(const SessionLeave()),
+                child: const Text('Leave Session'),
               ),
             ),
           ],

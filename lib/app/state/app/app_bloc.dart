@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/repositories/authentication_repository.dart';
 import 'package:equatable/equatable.dart';

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:ffi';
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
@@ -127,18 +126,6 @@ class SessionRepository {
 
     final int length = data == null ? 0 : (data as List).length;
 
-    // get length and check for missing item in list such as 0,1,2,4,5
-    // final int missingInList = List.from(data as List).fold(0, (previousValue, element) {
-    //   final int index = (element as Map).keys.first as int;
-    //   if (previousValue == index) {
-    //     return previousValue + 1;
-    //   } else {
-    //     return previousValue;
-    //   }
-    // });
-
-    // log('missingInList $missingInList');
-
     int b = 0;
     int a = 0;
     if (data != null) {
@@ -190,12 +177,43 @@ class SessionRepository {
         i++;
         final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
         if (selection.userId == user.uid) {
-          log('removing selection');
           await ref
               .child('${i - 1}')
-              .remove()
+              .update(selection.copyWith(lockedIn: false).toJson())
               .onError((error, stackTrace) => log('error removing card selection $error'))
               .whenComplete(() => log('removed selection'));
+          return;
+        }
+      }
+    }
+  }
+
+  Future<void> leaveSession() async {
+    final session = await ref.get();
+    final User user = FirebaseAuth.instance.currentUser!;
+
+    if (session.value != null) {
+      // ignore: cast_nullable_to_non_nullable
+      final data = Map<String, dynamic>.from(session.value as Map);
+      final Session sessionResult = Session.fromJson(data);
+
+      if (sessionResult.owner == user.uid) {
+        await ref.remove();
+        return;
+      }
+
+      if (sessionResult.participants == null || sessionResult.participants!.isEmpty) {
+        return;
+      }
+
+      for (final p in sessionResult.participants ?? []) {
+        final participant = p as Participant;
+        if (participant.id == user.uid) {
+          final updatedSession = sessionResult.copyWith(
+            participants: sessionResult.participants!.where((element) => element.id != user.uid).toList(),
+          );
+
+          await ref.update(updatedSession.toJson());
           return;
         }
       }

@@ -7,22 +7,26 @@ part 'selection_model.g.dart';
 class Selection extends Equatable {
   final String userId;
   final int cardSelected;
+  final bool lockedIn;
 
   const Selection({
     required this.userId,
     required this.cardSelected,
+    required this.lockedIn,
   });
 
   @override
-  List<Object?> get props => [userId, cardSelected];
+  List<Object?> get props => [userId, cardSelected, lockedIn];
 
   Selection copyWith({
     String? userId,
     int? cardSelected,
+    bool? lockedIn,
   }) {
     return Selection(
       userId: userId ?? this.userId,
       cardSelected: cardSelected ?? this.cardSelected,
+      lockedIn: lockedIn ?? this.lockedIn,
     );
   }
 
@@ -34,6 +38,7 @@ class Selection extends Equatable {
     return const Selection(
       userId: '',
       cardSelected: 0,
+      lockedIn: false,
     );
   }
 }

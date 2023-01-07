@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
@@ -82,7 +81,14 @@ class DashboardPage extends StatelessWidget {
                     const SizedBox(height: 20),
                     Wrap(
                       children: [
-                        for (final selection in state.session.selections ?? []) AgileCard(shirt: tShirtSizes[selection.cardSelected]),
+                        for (final selection in state.session.selections ?? [])
+                          AgileCard(
+                            shirt: tShirtSizes[selection.cardSelected],
+                            participant: state.session.participants?.singleWhere(
+                              (element) => element.id == selection.userId,
+                              orElse: () => Participant.empty(),
+                            ),
+                          ),
                       ],
                     ),
                   ],
