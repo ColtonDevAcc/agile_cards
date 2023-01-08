@@ -1,15 +1,16 @@
 {
   "project_info": {
     "project_number": "964978059660",
+    "firebase_url": "https://agilecards-da16f-default-rtdb.firebaseio.com",
     "project_id": "agilecards-da16f",
     "storage_bucket": "agilecards-da16f.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:964978059660:android:f1835ecd27c2eef0438ea9",
+        "mobilesdk_app_id": "1:964978059660:android:91a605ff5dc13826438ea9",
         "android_client_info": {
-          "package_name": " com.voostack.agilecardssprintplanning"
+          "package_name": "com.voostack.agilecardssprintplanning"
         }
       },
       "oauth_client": [
@@ -31,10 +32,10 @@
               "client_type": 3
             },
             {
-              "client_id": "964978059660-cibv0anqgiqs253u1meap4p565552gb3.apps.googleusercontent.com",
+              "client_id": "964978059660-6fo53jtaq0qqfidbejk6bt607qqd8ue2.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": " com.voostack.agilecardssprintplanning"
+                "bundle_id": "com.voostack.agilecardssprintplanning"
               }
             }
           ]

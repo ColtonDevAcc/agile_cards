@@ -36,13 +36,15 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<SessionLeave>(_onSessionLeave);
     on<SessionNameChanged>(_onSessionNameChanged);
     on<SessionDescriptionChanged>(_onSessionDescriptionChanged);
+    on<SessionForceParticipantAdded>(_onSessionParticipantAdded);
+    on<SessionForceParticipantRemoved>(_onSessionForceParticipantRemoved);
     sessionSubscription = sessionRepository.status.listen((status) => add(SessionChanged(status)));
   }
 
   Future<void> _onSessionCreated(SessionCreated event, Emitter<SessionState> emit) async {
     try {
       final Session session = Session(
-        id: event.owner.id,
+        id: event.owner.id ?? '',
         name: 'test',
         description: 'description',
         owner: FirebaseAuth.instance.currentUser?.email,
@@ -103,6 +105,14 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
 
   Future<void> _onSessionDescriptionChanged(SessionDescriptionChanged event, Emitter<SessionState> emit) async {
     await sessionRepository.updateSessionDescription(description: event.description);
+  }
+
+  Future<void> _onSessionParticipantAdded(SessionForceParticipantAdded event, Emitter<SessionState> emit) async {
+    await sessionRepository.forceAddParticipant(participant: event.participant);
+  }
+
+  Future<void> _onSessionForceParticipantRemoved(SessionForceParticipantRemoved event, Emitter<SessionState> emit) async {
+    await sessionRepository.forceRemoveParticipant(participant: event.participant);
   }
 
   @override

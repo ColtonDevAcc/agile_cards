@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
@@ -11,55 +9,48 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stacked_card_carousel/stacked_card_carousel.dart';
 
 class AgileCardSelector extends StatelessWidget {
-  const AgileCardSelector({Key? key}) : super(key: key);
+  final List<Selection> selections;
+  const AgileCardSelector({Key? key, required this.selections}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SessionBloc, SessionState>(
-      builder: (context, state) {
-        final List<Selection> selections = state.session.selections ?? [];
-        final Selection userSelection = selections.firstWhere(
-          (element) => element.userId == context.read<AppBloc>().state.user!.id,
-          orElse: () => Selection.empty(),
-        );
-
-        log('userSelection: ${userSelection.lockedIn}');
-
-        return userSelection.lockedIn == false
-            ? StackedCardCarousel(
-                spaceBetweenItems: 200,
-                items: [
-                  for (final shirt in tShirtSizes)
-                    GestureDetector(
-                      onTap: () {
-                        context.read<SessionBloc>().add(
-                              SessionAgileCardSelected(
-                                Selection(
-                                  cardSelected: tShirtSizes.indexOf(shirt),
-                                  userId: context.read<AppBloc>().state.user!.id,
-                                  lockedIn: true,
-                                ),
-                              ),
-                            );
-                      },
-                      child: AgileCard(shirt: shirt),
-                    ),
-                ],
-              )
-            : Center(
-                child: Column(
-                  children: [
-                    AgileCard(shirt: tShirtSizes[userSelection.cardSelected]),
-                    const SizedBox(height: 20),
-                    TextButton(
-                      onPressed: () => context.read<SessionBloc>().add(const SessionAgileCardDeselected()),
-                      child: const Text('change selection'),
-                    )
-                  ],
-                ),
-              );
-      },
+    final Selection userSelection = selections.firstWhere(
+      (element) => element.userId == context.read<AppBloc>().state.user!.id,
+      orElse: () => Selection.empty(),
     );
+    return userSelection.lockedIn == false
+        ? StackedCardCarousel(
+            spaceBetweenItems: 200,
+            items: [
+              for (final shirt in tShirtSizes)
+                GestureDetector(
+                  onTap: () {
+                    context.read<SessionBloc>().add(
+                          SessionAgileCardSelected(
+                            Selection(
+                              cardSelected: tShirtSizes.indexOf(shirt),
+                              userId: context.read<AppBloc>().state.user!.id!,
+                              lockedIn: true,
+                            ),
+                          ),
+                        );
+                  },
+                  child: AgileCard(shirt: shirt),
+                ),
+            ],
+          )
+        : Center(
+            child: Column(
+              children: [
+                AgileCard(shirt: tShirtSizes[userSelection.cardSelected]),
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: () => context.read<SessionBloc>().add(const SessionAgileCardDeselected()),
+                  child: const Text('change selection'),
+                )
+              ],
+            ),
+          );
   }
 }
 

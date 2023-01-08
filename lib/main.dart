@@ -13,7 +13,11 @@ import 'firebase_options.dart';
 GetIt locator = GetIt.instance;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await Firebase.initializeApp(
+    name: 'AgileCards',
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   locator.registerLazySingleton(() => AnalyticsService(debug: true));
   runApp(const App());
 }

@@ -20,3 +20,10 @@ class AuthenticationLogoutRequested extends AppEvent {}
 class AuthenticationPersistRequested extends AppEvent {}
 
 class AuthenticationPersisted extends AppEvent {}
+
+class ChangeUserAvatar extends AppEvent {
+  const ChangeUserAvatar();
+
+  @override
+  List<Object> get props => [];
+}

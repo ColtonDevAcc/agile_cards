@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -6,8 +7,8 @@ part 'participant_model.g.dart';
 
 @JsonSerializable(anyMap: true, createFieldMap: true)
 class Participant extends Equatable {
-  final String id;
-  final String email;
+  final String? id;
+  final String? email;
   final String? imageUrl;
   final String? phone;
   final String? name;
@@ -15,8 +16,8 @@ class Participant extends Equatable {
   final String? session;
 
   const Participant({
-    required this.id,
-    required this.email,
+    this.id,
+    this.email,
     this.name,
     this.imageUrl,
     this.phone,
@@ -49,6 +50,23 @@ class Participant extends Equatable {
 
   factory Participant.fromJson(Map<String, dynamic> json) => _$ParticipantFromJson(json);
   Map<String, dynamic> toJson() => _$ParticipantToJson(this);
+
+  List<Participant> parseRawList(Object? raw) {
+    try {
+      raw as Map?;
+      if (raw == null || raw.isEmpty) {
+        return [];
+      }
+      final list = raw['Participants'] as List?;
+      if (list == null || list.isEmpty) {
+        return [];
+      }
+      return list.map((e) => Participant.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+    } catch (e) {
+      log("error parsing from rawList $e");
+      return [];
+    }
+  }
 
   //from firebase user() to participant
   factory Participant.fromUser(User user) {

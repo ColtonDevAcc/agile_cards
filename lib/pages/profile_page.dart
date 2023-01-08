@@ -1,5 +1,5 @@
 import 'package:agile_cards/app/state/app/app_bloc.dart';
-import 'package:agile_cards/app/state/session/session_bloc.dart';
+import 'package:agile_cards/widgets/atoms/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,8 +16,12 @@ class ProfilePage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 20),
+            UserAvatar(
+              radius: 50,
+              onTap: () => context.read<AppBloc>().add(const ChangeUserAvatar()),
+            ),
             const SizedBox(height: 20),
             Text(user?.email ?? ''),
             const SizedBox(height: 20),

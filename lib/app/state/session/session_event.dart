@@ -106,3 +106,19 @@ class SessionDescriptionChanged extends SessionEvent {
   @override
   List<Object> get props => [description];
 }
+
+class SessionForceParticipantAdded extends SessionEvent {
+  final Participant participant;
+  const SessionForceParticipantAdded(this.participant);
+
+  @override
+  List<Object> get props => [participant];
+}
+
+class SessionForceParticipantRemoved extends SessionEvent {
+  final Participant participant;
+  const SessionForceParticipantRemoved(this.participant);
+
+  @override
+  List<Object> get props => [participant];
+}

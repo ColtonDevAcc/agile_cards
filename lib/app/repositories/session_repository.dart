@@ -123,7 +123,6 @@ class SessionRepository {
     final Object? data = await ref.get().then((value) => value.child('selections').value);
     final sessionSelection = selection.toJson();
     final User user = FirebaseAuth.instance.currentUser!;
-
     final int length = data == null ? 0 : (data as List).length;
 
     int b = 0;
@@ -213,6 +212,22 @@ class SessionRepository {
             participants: sessionResult.participants!.where((element) => element.id != user.uid).toList(),
           );
 
+          //remove selections if they exist
+          // ignore: cast_nullable_to_non_nullable
+          final List? selections = await ref.get().then((value) => value.child('selections').value as List?);
+          if (selections != null && selections.isNotEmpty) {
+            final List<Selection> newList = selections.map((e) => Selection.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+            newList.removeWhere((element) => element.userId == user.uid);
+            log("selections $newList");
+
+            if (newList.isEmpty) {
+              await ref.child('selections').remove();
+              return;
+            }
+
+            await ref.child('selections').set(selections);
+          }
+
           await ref.update(updatedSession.toJson());
           return;
         }
@@ -226,6 +241,22 @@ class SessionRepository {
 
   Future<void> updateSessionDescription({required String description}) async {
     await ref.update({'description': description});
+  }
+
+  Future<void> forceAddParticipant({required Participant participant}) async {
+    final participantData = await ref.child('participants').get();
+    final List<Participant> participants = const Participant().parseRawList(participantData.value);
+    participants.add(participant);
+
+    await ref.child('participants').set(participants.map((e) => e.toJson()).toList());
+  }
+
+  Future<void> forceRemoveParticipant({required Participant participant}) async {
+    final participantData = await ref.child('participants').get();
+    final List<Participant> participants = const Participant().parseRawList(participantData.value);
+    participants.removeWhere((element) => element.id == participant.id);
+
+    await ref.child('participants').set(participants.map((e) => e.toJson()).toList());
   }
 }
 

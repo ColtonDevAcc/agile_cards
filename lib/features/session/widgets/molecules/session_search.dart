@@ -70,10 +70,10 @@ class SearchSessionBottomSheet extends StatelessWidget {
                           Navigator.of(context).pop();
                         },
                         child: ListTile(
-                          title: Text(participant.email),
+                          title: Text(participant.email!),
                           subtitle: Wrap(
                             spacing: 8,
-                            children: participants.map((p) => Chip(label: Text(p.email.split('@')[0]))).toList(),
+                            children: participants.map((p) => Chip(label: Text(p.email!.split('@')[0]))).toList(),
                           ),
                           trailing: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
                         ),
