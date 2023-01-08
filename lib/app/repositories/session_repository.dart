@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
+import 'package:agile_cards/app/services/analytics_service.dart';
+import 'package:agile_cards/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -17,230 +19,278 @@ class SessionRepository {
   }
 
   void subscribeToSession(DatabaseReference? dbRef) {
-    if (dbRef != null) {
-      dbRef.onValue.listen(
-        (event) {
+    try {
+      if (dbRef != null) {
+        dbRef.onValue.listen(
+          (event) {
+            if (event.snapshot.value != null) {
+              // ignore: cast_nullable_to_non_nullable
+              final data = Map<String, dynamic>.from(event.snapshot.value as Map<dynamic, dynamic>);
+              controller.add(SessionStream(stream: Session.fromJson(data)));
+              ref = dbRef;
+            } else {
+              controller.add(SessionStream(stream: Session.empty()));
+            }
+          },
+        );
+      } else {
+        ref.onValue.listen((event) {
           if (event.snapshot.value != null) {
             // ignore: cast_nullable_to_non_nullable
             final data = Map<String, dynamic>.from(event.snapshot.value as Map<dynamic, dynamic>);
+            log('something changed');
             controller.add(SessionStream(stream: Session.fromJson(data)));
-            ref = dbRef;
-          } else {
-            controller.add(SessionStream(stream: Session.empty()));
           }
-        },
-      );
-    } else {
-      ref.onValue.listen((event) {
-        if (event.snapshot.value != null) {
-          // ignore: cast_nullable_to_non_nullable
-          final data = Map<String, dynamic>.from(event.snapshot.value as Map<dynamic, dynamic>);
-          log('something changed');
-          controller.add(SessionStream(stream: Session.fromJson(data)));
-        }
-      });
-      ref = dbRef!;
+        });
+        ref = dbRef!;
+      }
+    } catch (e) {
+      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'subscribe_to_session', stacktrace: StackTrace.current);
     }
   }
 
   Future<Session?> searchForSession(String query) async {
-    if (query.isEmpty) {
-      log('query is empty');
-      return null;
-    }
-    final sessionRef = FirebaseDatabase.instance.ref('sessions/$query');
-    final DatabaseEvent session = await sessionRef.once();
+    try {
+      if (query.isEmpty) {
+        log('query is empty');
+        return null;
+      }
+      final sessionRef = FirebaseDatabase.instance.ref('sessions/$query');
+      final DatabaseEvent session = await sessionRef.once();
 
-    if (session.snapshot.value != null) {
-      // ignore: cast_nullable_to_non_nullable
-      final data = Map<String, dynamic>.from(session.snapshot.value as Map);
-      final Session sessionResult = Session.fromJson(data);
-      log('session found $sessionResult');
-      return sessionResult;
-    } else {
-      log('no session found');
+      if (session.snapshot.value != null) {
+        // ignore: cast_nullable_to_non_nullable
+        final data = Map<String, dynamic>.from(session.snapshot.value as Map);
+        final Session sessionResult = Session.fromJson(data);
+        log('session found $sessionResult');
+        return sessionResult;
+      } else {
+        log('no session found');
+      }
+      locator<AnalyticsService>().logEvent(
+        name: 'search_for_session',
+      );
+    } catch (e) {
+      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'search_for_session', stacktrace: StackTrace.current);
     }
 
     return null;
   }
 
   Future<void> createSession(Session session) async {
-    final String? uid = FirebaseAuth.instance.currentUser?.uid;
-    final updatedSession = session.copyWith(id: uid, owner: uid);
-    await ref
-        .set(updatedSession.toJson())
-        .onError((error, stackTrace) => log('error creating session: $error'))
-        .whenComplete(() => log('session created'));
+    try {
+      final String? uid = FirebaseAuth.instance.currentUser?.uid;
+      final updatedSession = session.copyWith(id: uid, owner: uid);
+      await ref
+          .set(updatedSession.toJson())
+          .onError((error, stackTrace) => log('error creating session: $error'))
+          .whenComplete(() => log('session created'));
 
-    subscribeToSession(ref);
+      subscribeToSession(ref);
+      locator<AnalyticsService>().logEvent(
+        name: 'create_session',
+      );
+    } catch (e) {
+      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'create_session', stacktrace: StackTrace.current);
+    }
   }
 
   Future<void> updateSession(Session session) async {
-    await ref.update(session.toJson());
+    await ref.update(session.toJson()).onError((error, stackTrace) {
+      locator<AnalyticsService>().logError(exception: error.toString(), reason: 'update_session', stacktrace: stackTrace);
+    }).whenComplete(() {
+      locator<AnalyticsService>().logEvent(
+        name: 'update_session',
+      );
+    });
   }
 
   Future<void> joinSession(String sessionId) async {
-    final sessionRef = FirebaseDatabase.instance.ref('sessions/$sessionId');
-    final sessionResult = await sessionRef.get();
+    try {
+      final sessionRef = FirebaseDatabase.instance.ref('sessions/$sessionId');
+      final sessionResult = await sessionRef.get();
 
-    final User user = FirebaseAuth.instance.currentUser!;
-    // ignore: cast_nullable_to_non_nullable
-    final data = sessionResult.value as Map<dynamic, dynamic>;
-    final Session session = Session.fromJson(Map<String, dynamic>.from(data));
+      final User user = FirebaseAuth.instance.currentUser!;
+      // ignore: cast_nullable_to_non_nullable
+      final data = sessionResult.value as Map<dynamic, dynamic>;
+      final Session session = Session.fromJson(Map<String, dynamic>.from(data));
 
-    if (user.uid == session.owner) {
-      log('returning you to the session as the owner');
-      return;
-    }
+      if (user.uid == session.owner) {
+        log('returning you to the session as the owner');
+        return;
+      }
 
-    if (session.participants == null || session.participants!.isEmpty) {
-      subscribeToSession(sessionRef);
-      return;
-    }
-
-    for (final p in session.participants ?? []) {
-      final participant = p as Participant;
-      if (participant.id == user.uid) {
-        log('returning you to the session as a participant');
+      if (session.participants == null || session.participants!.isEmpty) {
         subscribeToSession(sessionRef);
         return;
       }
+
+      for (final p in session.participants ?? []) {
+        final participant = p as Participant;
+        if (participant.id == user.uid) {
+          log('returning you to the session as a participant');
+          subscribeToSession(sessionRef);
+          return;
+        }
+      }
+
+      final updatedSession = session.copyWith(
+        participants: [
+          ...session.participants ?? [],
+          Participant.fromUser(user),
+        ],
+      );
+
+      await sessionRef.update(updatedSession.toJson());
+
+      subscribeToSession(sessionRef);
+      locator<AnalyticsService>().logEvent(
+        name: 'joined_session',
+      );
+    } catch (e) {
+      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'join_session', stacktrace: StackTrace.current);
     }
-
-    final updatedSession = session.copyWith(
-      participants: [
-        ...session.participants ?? [],
-        Participant.fromUser(user),
-      ],
-    );
-
-    await sessionRef.update(updatedSession.toJson());
-
-    subscribeToSession(sessionRef);
   }
 
   Future<void> agileCardSelected(Selection selection) async {
-    final ref = this.ref.child('selections');
-    final Object? data = await ref.get().then((value) => value.child('selections').value);
-    final sessionSelection = selection.toJson();
-    final User user = FirebaseAuth.instance.currentUser!;
-    final int length = data == null ? 0 : (data as List).length;
+    try {
+      final ref = this.ref.child('selections');
+      final Object? data = await ref.get().then((value) => value.child('selections').value);
+      final sessionSelection = selection.toJson();
+      final User user = FirebaseAuth.instance.currentUser!;
+      final int length = data == null ? 0 : (data as List).length;
 
-    int b = 0;
-    int a = 0;
-    if (data != null) {
-      for (final s in data as List) {
-        b++;
-        final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
-        if (selection.userId == user.uid) {
-          await ref
-              .child('$a')
-              .set(sessionSelection)
-              .onError((error, stackTrace) => log('error updating card selection $error'))
-              .whenComplete(() => log('updated selection'));
-          return;
-        } else if (a - b != 1 && b != 0) {
-          await ref
-              .child('$b')
-              .set(sessionSelection)
-              .onError((error, stackTrace) => log('error updating card selection $error'))
-              .whenComplete(() => log('updated selection'));
-          return;
+      int b = 0;
+      int a = 0;
+      if (data != null) {
+        for (final s in data as List) {
+          b++;
+          final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
+          if (selection.userId == user.uid) {
+            await ref.child('$a').set(sessionSelection).whenComplete(() => log('updated selection'));
+            return;
+          } else if (a - b != 1 && b != 0) {
+            await ref.child('$b').set(sessionSelection).whenComplete(() => log('updated selection'));
+            return;
+          }
+          a++;
         }
-        a++;
       }
-    }
 
-    if (data == null || length == 0) {
-      await ref
-          .set([sessionSelection])
-          .onError((error, stackTrace) => log('error adding card selection $error'))
-          .whenComplete(() => log('added first selection'));
-    } else {
-      await ref
-          .child('$length')
-          .set(sessionSelection)
-          .onError((error, stackTrace) => log('error adding card selection $error'))
-          .whenComplete(() => log('added selection'));
+      if (data == null || length == 0) {
+        await ref.set([sessionSelection]).whenComplete(() => log('added first selection'));
+      } else {
+        await ref.child('$length').set(sessionSelection).whenComplete(() => log('added selection'));
+      }
+      locator<AnalyticsService>().logEvent(
+        name: 'selected_agile_card',
+        parameters: {'agile_card_selected': selection.cardSelected},
+      );
+    } catch (e) {
+      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'agile_card_selected', stacktrace: StackTrace.current);
     }
   }
 
   Future<void> agileCardDeselected() async {
-    final ref = this.ref.child('selections');
-    final Object? data = await ref.get().then((value) => value.child('selections').value);
-    final User user = FirebaseAuth.instance.currentUser!;
+    try {
+      final ref = this.ref.child('selections');
+      final Object? data = await ref.get().then((value) => value.child('selections').value);
+      final User user = FirebaseAuth.instance.currentUser!;
 
-    if (data != null) {
-      int i = 0;
-      for (final s in data as List) {
-        i++;
-        final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
-        if (selection.userId == user.uid) {
-          await ref
-              .child('${i - 1}')
-              .update(selection.copyWith(lockedIn: false).toJson())
-              .onError((error, stackTrace) => log('error removing card selection $error'))
-              .whenComplete(() => log('removed selection'));
-          return;
+      if (data != null) {
+        int i = 0;
+        for (final s in data as List) {
+          i++;
+          final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
+          if (selection.userId == user.uid) {
+            await ref
+                .child('${i - 1}')
+                .update(selection.copyWith(lockedIn: false).toJson())
+                .onError((error, stackTrace) => log('error removing card selection $error'))
+                .whenComplete(() => log('removed selection'));
+            return;
+          }
         }
       }
+      locator<AnalyticsService>().logEvent(name: 'deselect_agile_card');
+    } catch (e) {
+      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'agile_card_deselected', stacktrace: StackTrace.current);
     }
   }
 
   Future<void> leaveSession() async {
-    final session = await ref.get();
-    final User user = FirebaseAuth.instance.currentUser!;
+    try {
+      final session = await ref.get();
+      final User user = FirebaseAuth.instance.currentUser!;
 
-    if (session.value != null) {
-      // ignore: cast_nullable_to_non_nullable
-      final data = Map<String, dynamic>.from(session.value as Map);
-      final Session sessionResult = Session.fromJson(data);
+      if (session.value != null) {
+        // ignore: cast_nullable_to_non_nullable
+        final data = Map<String, dynamic>.from(session.value as Map);
+        final Session sessionResult = Session.fromJson(data);
 
-      if (sessionResult.owner == user.uid) {
-        await ref.remove();
-        return;
-      }
-
-      if (sessionResult.participants == null || sessionResult.participants!.isEmpty) {
-        return;
-      }
-
-      for (final p in sessionResult.participants ?? []) {
-        final participant = p as Participant;
-        if (participant.id == user.uid) {
-          final updatedSession = sessionResult.copyWith(
-            participants: sessionResult.participants!.where((element) => element.id != user.uid).toList(),
-          );
-
-          //remove selections if they exist
-          // ignore: cast_nullable_to_non_nullable
-          final List? selections = await ref.get().then((value) => value.child('selections').value as List?);
-          if (selections != null && selections.isNotEmpty) {
-            final List<Selection> newList = selections.map((e) => Selection.fromJson(Map<String, dynamic>.from(e as Map))).toList();
-            newList.removeWhere((element) => element.userId == user.uid);
-            log("selections $newList");
-
-            if (newList.isEmpty) {
-              await ref.child('selections').remove();
-              return;
-            }
-
-            await ref.child('selections').set(selections);
-          }
-
-          await ref.update(updatedSession.toJson());
+        if (sessionResult.owner == user.uid) {
+          await ref.remove();
           return;
         }
+
+        if (sessionResult.participants == null || sessionResult.participants!.isEmpty) {
+          return;
+        }
+
+        for (final p in sessionResult.participants ?? []) {
+          final participant = p as Participant;
+          if (participant.id == user.uid) {
+            final updatedSession = sessionResult.copyWith(
+              participants: sessionResult.participants!.where((element) => element.id != user.uid).toList(),
+            );
+
+            //remove selections if they exist
+            // ignore: cast_nullable_to_non_nullable
+            final List? selections = await ref.get().then((value) => value.child('selections').value as List?);
+            if (selections != null && selections.isNotEmpty) {
+              final List<Selection> newList = selections.map((e) => Selection.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+              newList.removeWhere((element) => element.userId == user.uid);
+              log("selections $newList");
+
+              if (newList.isEmpty) {
+                await ref.child('selections').remove();
+                return;
+              }
+
+              await ref.child('selections').set(selections);
+            }
+
+            await ref.update(updatedSession.toJson());
+            return;
+          }
+        }
       }
+      locator<AnalyticsService>().logEvent(
+        name: 'leave_session',
+      );
+    } catch (e) {
+      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'leave_session', stacktrace: StackTrace.current);
     }
   }
 
   Future<void> updateSessionName({required String name}) async {
-    await ref.update({'name': name});
+    await ref.update({'name': name}).onError((error, stackTrace) {
+      locator<AnalyticsService>().logError(exception: error.toString(), reason: 'update_session_name', stacktrace: stackTrace);
+    }).whenComplete(() {
+      locator<AnalyticsService>().logEvent(
+        name: 'update_session_name',
+      );
+    });
   }
 
   Future<void> updateSessionDescription({required String description}) async {
-    await ref.update({'description': description});
+    await ref.update({'description': description}).onError((error, stackTrace) {
+      locator<AnalyticsService>().logError(exception: error.toString(), reason: 'update_session_description', stacktrace: stackTrace);
+    }).onError((error, stackTrace) {
+      locator<AnalyticsService>().logEvent(
+        name: 'update_session_description',
+      );
+    });
   }
 
   Future<void> forceAddParticipant({required Participant participant}) async {
@@ -248,31 +298,61 @@ class SessionRepository {
     final List<Participant> participants = const Participant().parseRawList(participantData.value);
     participants.add(participant);
 
-    await ref.child('participants').set(participants.map((e) => e.toJson()).toList());
+    await ref.child('participants').set(participants.map((e) => e.toJson()).toList()).onError((error, stackTrace) {
+      locator<AnalyticsService>().logError(exception: error.toString(), reason: 'force_add_participant', stacktrace: stackTrace);
+    });
+
+    locator<AnalyticsService>().logEvent(
+      name: 'force_add_participant',
+      parameters: {'force_add_participant': participant.id},
+    );
   }
 
   Future<void> forceRemoveParticipant({required Participant participant}) async {
-    final participantData = await ref.child('participants').get();
-    final List<Participant> participants = const Participant().parseRawList(participantData.value);
-    participants.removeWhere((element) => element.id == participant.id);
+    try {
+      final participantData = await ref.child('participants').get();
+      final List<Participant> participants = const Participant().parseRawList(participantData.value);
+      participants.removeWhere((element) => element.id == participant.id);
 
-    //if have selections remove them
-    if (participants.isNotEmpty) {
-      final participantData = await ref.child('selections').get();
+      //if have selections remove them
+      if (participants.isNotEmpty) {
+        final participantData = await ref.child('selections').get();
 
-      final List<Selection> selections = const Selection().parseRawList(participantData.value);
-      selections.removeWhere((element) => element.userId == participant.id);
+        final List<Selection> selections = const Selection().parseRawList(participantData.value);
+        selections.removeWhere((element) => element.userId == participant.id);
+      }
+
+      await ref.child('participants').set(participants.map((e) => e.toJson()).toList());
+
+      locator<AnalyticsService>().logEvent(
+        name: 'force_remove_participant',
+        parameters: {'force_removed_participant': participant.id},
+      );
+    } catch (e) {
+      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'force_remove_participant', stacktrace: StackTrace.current);
     }
-
-    await ref.child('participants').set(participants.map((e) => e.toJson()).toList());
   }
 
   Future<void> changeCardReveal({required bool reveal}) async {
-    await ref.update({'cardsRevealed': reveal});
+    await ref.update({'cardsRevealed': reveal}).onError((error, stackTrace) {
+      locator<AnalyticsService>().logError(exception: error.toString(), reason: 'change_card_reveal', stacktrace: stackTrace);
+    }).whenComplete(() {
+      locator<AnalyticsService>().logEvent(
+        name: 'reveal_card',
+        parameters: {'reveal_card': reveal},
+      );
+    });
   }
 
   Future<void> useShirtSizes({required bool useShirtSizes}) async {
-    await ref.update({'isShirtSizes': useShirtSizes});
+    await ref.update({'isShirtSizes': useShirtSizes}).onError((error, stackTrace) {
+      locator<AnalyticsService>().logError(exception: error.toString(), reason: 'use_shirt_sizes', stacktrace: stackTrace);
+    }).whenComplete(() {
+      locator<AnalyticsService>().logEvent(
+        name: 'use_shirt_sizes',
+        parameters: {'use_shirt_sizes': useShirtSizes},
+      );
+    });
   }
 }
 

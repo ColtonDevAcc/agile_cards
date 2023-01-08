@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:agile_cards/main.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart';
@@ -12,11 +13,10 @@ class AnalyticsService extends NavigatorObserver {
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   final FirebaseCrashlytics crashlytics = FirebaseCrashlytics.instance;
   final FirebasePerformance performance = FirebasePerformance.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
   String currentRoute = "/";
-  AnalyticsService({
-    this.debug = false,
-  }) {
-    if (!kDebugMode) {
+  AnalyticsService({required this.debug}) {
+    if (!debug) {
       performance.setPerformanceCollectionEnabled(true);
       crashlytics.setCrashlyticsCollectionEnabled(true);
       analytics.setAnalyticsCollectionEnabled(true);
@@ -102,10 +102,19 @@ class AnalyticsService extends NavigatorObserver {
     return dio;
   }
 
+  Future<void> logNetworkPerformance({required String url, required int time}) async {
+    if (debug) log("network performance logged: $url with time: $time");
+    await analytics.logEvent(name: 'network_performance', parameters: {'url': url, 'time': time});
+  }
+
+  Future<void> logLoggedIn({String? loggedInMethod}) async {
+    if (debug) log("logged in");
+    await analytics.setUserId(id: auth.currentUser!.uid);
+    await analytics.logLogin(loginMethod: loggedInMethod);
+  }
+
   void get analyticsInstance => analytics;
-
   void get crashlyticsInstance => crashlytics;
-
   void get performanceInstance => performance;
 
   @override
