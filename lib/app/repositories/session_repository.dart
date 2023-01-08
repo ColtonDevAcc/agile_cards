@@ -23,9 +23,10 @@ class SessionRepository {
           if (event.snapshot.value != null) {
             // ignore: cast_nullable_to_non_nullable
             final data = Map<String, dynamic>.from(event.snapshot.value as Map<dynamic, dynamic>);
-            log('something new changed');
             controller.add(SessionStream(stream: Session.fromJson(data)));
             ref = dbRef;
+          } else {
+            controller.add(SessionStream(stream: Session.empty()));
           }
         },
       );
@@ -139,7 +140,6 @@ class SessionRepository {
               .whenComplete(() => log('updated selection'));
           return;
         } else if (a - b != 1 && b != 0) {
-          log("missing item in list $b");
           await ref
               .child('$b')
               .set(sessionSelection)
@@ -258,9 +258,36 @@ class SessionRepository {
 
     await ref.child('participants').set(participants.map((e) => e.toJson()).toList());
   }
+
+  Future<void> changeCardReveal({required bool reveal}) async {
+    await ref.update({'cardsRevealed': reveal});
+  }
 }
 
 class SessionStream {
   Session? stream;
   SessionStream({required this.stream});
 }
+
+const List<String> tShirtSizes = [
+  'XS',
+  'S',
+  'M',
+  'L',
+  'XL',
+  'XXL',
+  'XXXL',
+];
+
+const List<String> taskSizes = [
+  '1',
+  '2',
+  '3',
+  '5',
+  '8',
+  '13',
+  '20',
+  '40',
+  '100',
+  '∞',
+];

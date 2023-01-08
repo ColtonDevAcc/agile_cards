@@ -8,6 +8,7 @@ part of 'session_model.dart';
 
 Session _$SessionFromJson(Map json) => Session(
       id: json['id'] as String,
+      cardsRevealed: json['cardsRevealed'] as bool?,
       selections: (json['selections'] as List<dynamic>?)
           ?.map((e) => Selection.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList(),
@@ -26,6 +27,7 @@ const _$SessionFieldMap = <String, String>{
   'id': 'id',
   'name': 'name',
   'participants': 'participants',
+  'cardsRevealed': 'cardsRevealed',
   'description': 'description',
   'owner': 'owner',
   'imageUrl': 'imageUrl',
@@ -37,6 +39,7 @@ Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'participants': instance.participants?.map((e) => e.toJson()).toList(),
+      'cardsRevealed': instance.cardsRevealed,
       'description': instance.description,
       'owner': instance.owner,
       'imageUrl': instance.imageUrl,

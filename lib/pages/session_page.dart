@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
@@ -21,14 +23,11 @@ class SessionPage extends StatelessWidget {
       appBar: AppBar(
         leading: const UserAvatar(),
         actions: [
-          GestureDetector(
-            child: const Icon(Icons.more_vert),
-            onTap: () => context.pushNamed('session_settings_page'),
-          ),
+          GestureDetector(child: const Icon(Icons.more_vert), onTap: () => context.pushNamed('session_settings_page')),
         ],
         title: BlocBuilder<SessionBloc, SessionState>(
           builder: (context, state) {
-            return GestureDetector(onTap: () async => FlutterClipboard.copy(state.session.id), child: Text(state.session.id));
+            return GestureDetector(onTap: () async => FlutterClipboard.copy(state.session.id), child: Text(state.session.name ?? 'unnamed'));
           },
         ),
       ),
@@ -62,26 +61,3 @@ class SessionPage extends StatelessWidget {
     );
   }
 }
-
-const List<String> tShirtSizes = [
-  'XS',
-  'S',
-  'M',
-  'L',
-  'XL',
-  'XXL',
-  'XXXL',
-];
-
-const List<String> taskSizes = [
-  '1',
-  '2',
-  '3',
-  '5',
-  '8',
-  '13',
-  '20',
-  '40',
-  '100',
-  '∞',
-];

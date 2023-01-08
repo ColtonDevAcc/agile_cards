@@ -115,6 +115,14 @@ class SessionForceParticipantAdded extends SessionEvent {
   List<Object> get props => [participant];
 }
 
+class SessionRevealCards extends SessionEvent {
+  final bool reveal;
+  const SessionRevealCards({required this.reveal});
+
+  @override
+  List<Object> get props => [reveal];
+}
+
 class SessionForceParticipantRemoved extends SessionEvent {
   final Participant participant;
   const SessionForceParticipantRemoved(this.participant);

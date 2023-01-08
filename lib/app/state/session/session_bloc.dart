@@ -18,10 +18,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   late StreamSubscription sessionSubscription;
   SessionBloc({required this.sessionRepository})
       : super(
-          SessionState(
-            session: Session.empty(),
-            cardSelection: const [],
-          ),
+          SessionState(session: Session.empty(), cardSelection: const []),
         ) {
     on<SessionStarted>(_onSessionStarted);
     on<SessionCreated>(_onSessionCreated);
@@ -38,6 +35,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<SessionDescriptionChanged>(_onSessionDescriptionChanged);
     on<SessionForceParticipantAdded>(_onSessionParticipantAdded);
     on<SessionForceParticipantRemoved>(_onSessionForceParticipantRemoved);
+    on<SessionRevealCards>(_onSessionRevealCards);
     sessionSubscription = sessionRepository.status.listen((status) => add(SessionChanged(status)));
   }
 
@@ -45,8 +43,8 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     try {
       final Session session = Session(
         id: event.owner.id ?? '',
-        name: 'test',
-        description: 'description',
+        name: 'unnamed',
+        description: 'no description',
         owner: FirebaseAuth.instance.currentUser?.email,
         participants: [event.owner],
       );
@@ -57,19 +55,13 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     }
   }
 
-  Future<void> _onSessionStarted(SessionStarted event, Emitter<SessionState> emit) async {
-    // final sessions = await sessionRepository.getSessions();
-  }
+  Future<void> _onSessionStarted(SessionStarted event, Emitter<SessionState> emit) async {}
 
   Future<void> _onSessionUpdated(SessionUpdated event, Emitter<SessionState> emit) async {
     await sessionRepository.updateSession(event.session);
   }
 
-  Future<void> _onSessionDeleted(SessionDeleted event, Emitter<SessionState> emit) async {
-    // await sessionRepository.deleteSession(event.session);
-    // final sessions = await sessionRepository.getSessions();
-    // emit(SessionState(sessions: sessions));
-  }
+  Future<void> _onSessionDeleted(SessionDeleted event, Emitter<SessionState> emit) async {}
 
   Future<void> _onSessionLoaded(SessionLoaded event, Emitter<SessionState> emit) async {}
 
@@ -113,6 +105,10 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
 
   Future<void> _onSessionForceParticipantRemoved(SessionForceParticipantRemoved event, Emitter<SessionState> emit) async {
     await sessionRepository.forceRemoveParticipant(participant: event.participant);
+  }
+
+  Future<void> _onSessionRevealCards(SessionRevealCards event, Emitter<SessionState> emit) async {
+    await sessionRepository.changeCardReveal(reveal: event.reveal);
   }
 
   @override

@@ -1,9 +1,10 @@
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
+import 'package:agile_cards/app/repositories/session_repository.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
-import 'package:agile_cards/pages/session_page.dart';
 import 'package:agile_cards/widgets/atoms/participant_avatar.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stacked_card_carousel/stacked_card_carousel.dart';
@@ -56,7 +57,8 @@ class AgileCardSelector extends StatelessWidget {
 
 class AgileCard extends StatelessWidget {
   final Participant? participant;
-  const AgileCard({Key? key, required this.shirt, this.participant}) : super(key: key);
+  final bool? reveal;
+  const AgileCard({Key? key, required this.shirt, this.participant, this.reveal}) : super(key: key);
   final String shirt;
 
   @override
@@ -72,9 +74,29 @@ class AgileCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (participant != null && participant != Participant.empty()) ParticipantAvatar(participant: participant),
+            if (participant != null && participant != Participant.empty())
+              Column(
+                children: [
+                  Center(child: ParticipantAvatar(participant: participant)),
+                  const SizedBox(width: 8),
+                  AutoSizeText(
+                    participant?.name != null && participant!.name!.isNotEmpty ? participant!.name! : participant!.email!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
             const Spacer(),
-            Center(child: Text(shirt)),
+            Center(
+              child: Text(
+                reveal == null
+                    ? shirt
+                    : reveal == true
+                        ? shirt
+                        : '?',
+              ),
+            ),
             const Spacer(),
           ],
         ),

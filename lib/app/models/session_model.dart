@@ -10,6 +10,7 @@ class Session extends Equatable {
   final String id;
   final String? name;
   final List<Participant>? participants;
+  final bool? cardsRevealed;
   final String? description;
   final String? owner;
   final String? imageUrl;
@@ -18,6 +19,7 @@ class Session extends Equatable {
 
   const Session({
     required this.id,
+    this.cardsRevealed,
     this.selections,
     this.name,
     this.description,
@@ -28,7 +30,7 @@ class Session extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, name, description, imageUrl, owner, participants, isShirtSizes, selections];
+  List<Object?> get props => [id, name, description, imageUrl, owner, participants, isShirtSizes, selections, cardsRevealed];
 
   Session copyWith({
     String? id,
@@ -39,6 +41,7 @@ class Session extends Equatable {
     bool? isShirtSizes,
     List<Participant>? participants,
     List<Selection>? selections,
+    bool? cardsRevealed,
   }) {
     return Session(
       id: id ?? this.id,
@@ -49,6 +52,7 @@ class Session extends Equatable {
       participants: participants ?? this.participants,
       isShirtSizes: isShirtSizes ?? this.isShirtSizes,
       selections: selections ?? this.selections,
+      cardsRevealed: cardsRevealed ?? this.cardsRevealed,
     );
   }
 
@@ -66,6 +70,7 @@ class Session extends Equatable {
       isShirtSizes: false,
       selections: [],
       participants: [],
+      cardsRevealed: false,
     );
   }
 }
