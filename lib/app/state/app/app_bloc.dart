@@ -52,7 +52,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   void onPersistRequested(AuthenticationPersistRequested event, Emitter<AppState> emit) {
-    authenticationRepository.persistUser();
+    authenticationRepository.persistUserAuth();
   }
 
   Future<void> onChangeUserAvatar(ChangeUserAvatar event, Emitter<AppState> emit) async {

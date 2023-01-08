@@ -19,6 +19,7 @@ Future<void> main() async {
     name: 'AgileCards',
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   locator.registerLazySingleton(() => AnalyticsService(debug: kDebugMode));
   runApp(const App());
 }
