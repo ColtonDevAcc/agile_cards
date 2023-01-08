@@ -3,6 +3,7 @@ import 'package:agile_cards/app/services/analytics_service.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +19,7 @@ Future<void> main() async {
     name: 'AgileCards',
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  locator.registerLazySingleton(() => AnalyticsService(debug: true));
+  locator.registerLazySingleton(() => AnalyticsService(debug: kDebugMode));
   runApp(const App());
 }
 
