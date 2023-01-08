@@ -21,6 +21,7 @@ class SessionOwnerView extends StatelessWidget {
     final bool isShirtSizes = session.isShirtSizes ?? true;
     final int sessionAverage = session.selections?.map((e) => e.cardSelected).reduce((value, element) => value! + element!) ?? 0;
     final String sessionAverageString = const Session().sessionMeasurementAverage(average: sessionAverage, shirtSizes: isShirtSizes);
+    final bool cardsRevealed = session.cardsRevealed ?? false;
     String measurementSize(int size) {
       if (isShirtSizes) {
         final length = tShirtSizes.length;
@@ -39,17 +40,17 @@ class SessionOwnerView extends StatelessWidget {
               padding: const EdgeInsets.all(20.0),
               child: Text('Waiting for $notLockedInCount participants'),
             ),
-          if (notLockedInCount == 0 && session.cardsRevealed == true)
+          if (notLockedInCount == 0 && cardsRevealed == true)
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Text('average score is $sessionAverageString'),
             ),
-          if (notLockedInCount == 0)
+          if (notLockedInCount == 0 && selections.isNotEmpty)
             PrimaryButton(
-              title: session.cardsRevealed != false ? 'Hide' : 'Reveal',
+              title: cardsRevealed == false ? 'Reveal' : 'Hide',
               onPressed: () {
                 // ignore: avoid_bool_literals_in_conditional_expressions
-                final bool reveal = session.cardsRevealed == false ? true : false;
+                final bool reveal = cardsRevealed == false ? true : false;
                 context.read<SessionBloc>().add(SessionRevealCards(reveal: reveal));
               },
             ),
@@ -59,7 +60,7 @@ class SessionOwnerView extends StatelessWidget {
               children: [
                 for (final selection in session.selections ?? [])
                   AgileCard(
-                    reveal: session.cardsRevealed == true,
+                    reveal: cardsRevealed == true,
                     measurement: measurementSize(selection.cardSelected),
                     participant: session.participants?.singleWhere(
                       (element) => element.id == selection.userId,
