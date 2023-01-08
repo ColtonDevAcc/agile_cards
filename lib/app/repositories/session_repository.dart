@@ -272,7 +272,7 @@ class SessionRepository {
   }
 
   Future<void> useShirtSizes({required bool useShirtSizes}) async {
-    await ref.update({'isShirtSize s': useShirtSizes});
+    await ref.update({'isShirtSizes': useShirtSizes});
   }
 }
 
