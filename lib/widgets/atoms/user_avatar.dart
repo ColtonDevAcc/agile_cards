@@ -8,17 +8,12 @@ import 'package:go_router/go_router.dart';
 class UserAvatar extends StatelessWidget {
   final double? radius;
   final VoidCallback? onTap;
-  const UserAvatar({
-    Key? key,
-    this.radius,
-    this.onTap,
-  }) : super(key: key);
+  const UserAvatar({Key? key, this.radius, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppBloc, AppState>(
       builder: (context, state) {
-        log('image url ${state.user?.imageUrl}');
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: GestureDetector(

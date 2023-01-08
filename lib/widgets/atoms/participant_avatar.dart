@@ -24,6 +24,7 @@ class ParticipantAvatar extends StatelessWidget {
               children: [
                 CircleAvatar(
                   backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundImage: participant?.imageUrl == null || participant!.imageUrl!.isEmpty ? null : NetworkImage(participant!.imageUrl!),
                   child: participant == null ? Text(user?.email?.characters.first ?? '??') : Text(participant?.email?.characters.first ?? '??'),
                 ),
                 if (isLockedIn != null)
