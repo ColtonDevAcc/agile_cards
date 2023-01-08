@@ -13,8 +13,8 @@ class SessionParticipantView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int notLockedInCount = session.selections?.where((element) => !element.lockedIn).length ?? 0;
-
+    final int notLockedInCount = session.selections?.where((element) => !element.lockedIn!).length ?? 0;
+    final isShirtSizes = session.isShirtSizes ?? true;
     return Expanded(
       child: Column(
         children: [
@@ -34,7 +34,7 @@ class SessionParticipantView extends StatelessWidget {
                 for (final selection in session.selections ?? [])
                   AgileCard(
                     reveal: true,
-                    shirt: tShirtSizes[selection.cardSelected],
+                    measurement: isShirtSizes ? tShirtSizes[selection.cardSelected] : taskSizes[selection.cardSelected],
                     participant: session.participants?.singleWhere(
                       (element) => element.id == selection.userId,
                       orElse: () => Participant.empty(),

@@ -256,11 +256,23 @@ class SessionRepository {
     final List<Participant> participants = const Participant().parseRawList(participantData.value);
     participants.removeWhere((element) => element.id == participant.id);
 
+    //if have selections remove them
+    if (participants.isNotEmpty) {
+      final participantData = await ref.child('selections').get();
+
+      final List<Selection> selections = const Selection().parseRawList(participantData.value);
+      selections.removeWhere((element) => element.userId == participant.id);
+    }
+
     await ref.child('participants').set(participants.map((e) => e.toJson()).toList());
   }
 
   Future<void> changeCardReveal({required bool reveal}) async {
     await ref.update({'cardsRevealed': reveal});
+  }
+
+  Future<void> useShirtSizes({required bool useShirtSizes}) async {
+    await ref.update({'isShirtSize s': useShirtSizes});
   }
 }
 

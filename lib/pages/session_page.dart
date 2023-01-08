@@ -27,7 +27,7 @@ class SessionPage extends StatelessWidget {
         ],
         title: BlocBuilder<SessionBloc, SessionState>(
           builder: (context, state) {
-            return GestureDetector(onTap: () async => FlutterClipboard.copy(state.session.id), child: Text(state.session.name ?? 'unnamed'));
+            return GestureDetector(onTap: () async => FlutterClipboard.copy(state.session.id!), child: Text(state.session.name ?? 'unnamed'));
           },
         ),
       ),

@@ -36,6 +36,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<SessionForceParticipantAdded>(_onSessionParticipantAdded);
     on<SessionForceParticipantRemoved>(_onSessionForceParticipantRemoved);
     on<SessionRevealCards>(_onSessionRevealCards);
+    on<SessionUseShirtSizes>(_onSessionUseShirtSizes);
     sessionSubscription = sessionRepository.status.listen((status) => add(SessionChanged(status)));
   }
 
@@ -109,6 +110,10 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
 
   Future<void> _onSessionRevealCards(SessionRevealCards event, Emitter<SessionState> emit) async {
     await sessionRepository.changeCardReveal(reveal: event.reveal);
+  }
+
+  Future<void> _onSessionUseShirtSizes(SessionUseShirtSizes event, Emitter<SessionState> emit) async {
+    await sessionRepository.useShirtSizes(useShirtSizes: event.useShirtSizes);
   }
 
   @override

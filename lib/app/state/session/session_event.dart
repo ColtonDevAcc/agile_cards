@@ -130,3 +130,11 @@ class SessionForceParticipantRemoved extends SessionEvent {
   @override
   List<Object> get props => [participant];
 }
+
+class SessionUseShirtSizes extends SessionEvent {
+  final bool useShirtSizes;
+  const SessionUseShirtSizes({required this.useShirtSizes});
+
+  @override
+  List<Object> get props => [useShirtSizes];
+}

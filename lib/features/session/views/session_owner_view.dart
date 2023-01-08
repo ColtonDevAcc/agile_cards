@@ -16,15 +16,34 @@ class SessionOwnerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Selection> selections = session.selections ?? [];
-    final int notLockedInCount = selections.where((element) => !element.lockedIn).length;
+    final int notLockedInCount = selections.where((element) => !element.lockedIn!).length;
     final Selection ownerSelection = selections.firstWhere((element) => element.userId == session.owner, orElse: () => Selection.empty());
+    final bool isShirtSizes = session.isShirtSizes ?? true;
+    final int sessionAverage = session.selections?.map((e) => e.cardSelected).reduce((value, element) => value! + element!) ?? 0;
+    final String sessionAverageString = const Session().sessionMeasurementAverage(average: sessionAverage, shirtSizes: isShirtSizes);
+    String measurementSize(int size) {
+      if (isShirtSizes) {
+        final length = tShirtSizes.length;
+        return tShirtSizes[size > length ? length - 1 : size];
+      } else {
+        final length = taskSizes.length;
+        return taskSizes[size > length ? length - 1 : size];
+      }
+    }
+
     return Expanded(
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Text('Waiting for $notLockedInCount participants'),
-          ),
+          if (notLockedInCount != 0)
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text('Waiting for $notLockedInCount participants'),
+            ),
+          if (notLockedInCount == 0 && session.cardsRevealed == true)
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text('average score is $sessionAverageString'),
+            ),
           if (notLockedInCount == 0)
             PrimaryButton(
               title: session.cardsRevealed != false ? 'Hide' : 'Reveal',
@@ -35,13 +54,13 @@ class SessionOwnerView extends StatelessWidget {
               },
             ),
           const SizedBox(height: 20),
-          if (ownerSelection == Selection.empty() || ownerSelection.lockedIn)
+          if (ownerSelection == Selection.empty() || ownerSelection.lockedIn!)
             Wrap(
               children: [
                 for (final selection in session.selections ?? [])
                   AgileCard(
                     reveal: session.cardsRevealed == true,
-                    shirt: tShirtSizes[selection.cardSelected],
+                    measurement: measurementSize(selection.cardSelected),
                     participant: session.participants?.singleWhere(
                       (element) => element.id == selection.userId,
                       orElse: () => Participant.empty(),
@@ -55,7 +74,7 @@ class SessionOwnerView extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: Text(ownerSelection.lockedIn ? 'you selected' : 'select your card'),
+                    child: Text(ownerSelection.lockedIn! ? 'you selected' : 'select your card'),
                   ),
                   Expanded(
                     child: AgileCardSelector(

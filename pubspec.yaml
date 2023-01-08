@@ -48,6 +48,7 @@ dependencies:
   #ui
   flip_card: ^0.6.0
   stacked_card_carousel: ^0.0.4
+  font_awesome_flutter: ^10.3.0
 
   #firebase
   firebase_core:

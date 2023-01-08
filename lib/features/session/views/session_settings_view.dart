@@ -6,6 +6,7 @@ import 'package:agile_cards/widgets/atoms/participant_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 class SessionSettingsView extends StatelessWidget {
@@ -60,6 +61,16 @@ class SessionSettingsView extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
+                if (isOwner)
+                  ListTile(
+                    title: const Text('switch measurement'),
+                    trailing: state.session.isShirtSizes ?? true ? const FaIcon(FontAwesomeIcons.shirt) : const FaIcon(FontAwesomeIcons.x),
+                    onTap: () {
+                      final bool isShirtSizes = state.session.isShirtSizes ?? true;
+                      // ignore: avoid_bool_literals_in_conditional_expressions
+                      context.read<SessionBloc>().add(SessionUseShirtSizes(useShirtSizes: isShirtSizes ? false : true));
+                    },
+                  ),
                 if (isOwner)
                   ListTile(
                     title: const Text('Participate in Session'),

@@ -19,31 +19,38 @@ class AgileCardSelector extends StatelessWidget {
       (element) => element.userId == context.read<AppBloc>().state.user!.id,
       orElse: () => Selection.empty(),
     );
+    final bool isShirtSizes = context.read<SessionBloc>().state.session.isShirtSizes ?? true;
+
     return userSelection.lockedIn == false
         ? StackedCardCarousel(
             spaceBetweenItems: 200,
             items: [
-              for (final shirt in tShirtSizes)
+              for (final selection in isShirtSizes ? tShirtSizes : taskSizes)
                 GestureDetector(
                   onTap: () {
                     context.read<SessionBloc>().add(
                           SessionAgileCardSelected(
                             Selection(
-                              cardSelected: tShirtSizes.indexOf(shirt),
+                              cardSelected: isShirtSizes ? tShirtSizes.indexOf(selection) : taskSizes.indexOf(selection),
                               userId: context.read<AppBloc>().state.user!.id!,
                               lockedIn: true,
                             ),
                           ),
                         );
                   },
-                  child: AgileCard(shirt: shirt),
+                  child: AgileCard(measurement: selection),
                 ),
             ],
           )
         : Center(
             child: Column(
               children: [
-                AgileCard(shirt: tShirtSizes[userSelection.cardSelected]),
+                AgileCard(
+                  measurement: const Selection().cardSelectionToMeasurement(
+                    isShirtSizes: isShirtSizes,
+                    selection: userSelection.cardSelected ?? 0,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 TextButton(
                   onPressed: () => context.read<SessionBloc>().add(const SessionAgileCardDeselected()),
@@ -58,8 +65,8 @@ class AgileCardSelector extends StatelessWidget {
 class AgileCard extends StatelessWidget {
   final Participant? participant;
   final bool? reveal;
-  const AgileCard({Key? key, required this.shirt, this.participant, this.reveal}) : super(key: key);
-  final String shirt;
+  const AgileCard({Key? key, required this.measurement, this.participant, this.reveal}) : super(key: key);
+  final String measurement;
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +98,9 @@ class AgileCard extends StatelessWidget {
             Center(
               child: Text(
                 reveal == null
-                    ? shirt
+                    ? measurement
                     : reveal == true
-                        ? shirt
+                        ? measurement
                         : '?',
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
+import 'package:agile_cards/app/repositories/session_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -7,7 +8,7 @@ part 'session_model.g.dart';
 
 @JsonSerializable(anyMap: true, createFieldMap: true, explicitToJson: true)
 class Session extends Equatable {
-  final String id;
+  final String? id;
   final String? name;
   final List<Participant>? participants;
   final bool? cardsRevealed;
@@ -18,7 +19,7 @@ class Session extends Equatable {
   final List<Selection>? selections;
 
   const Session({
-    required this.id,
+    this.id,
     this.cardsRevealed,
     this.selections,
     this.name,
@@ -54,6 +55,14 @@ class Session extends Equatable {
       selections: selections ?? this.selections,
       cardsRevealed: cardsRevealed ?? this.cardsRevealed,
     );
+  }
+
+  String sessionMeasurementAverage({required int average, required bool shirtSizes}) {
+    if (shirtSizes) {
+      return tShirtSizes.length < average ? tShirtSizes.last : tShirtSizes[average];
+    } else {
+      return taskSizes.length < average ? taskSizes.last : taskSizes[average];
+    }
   }
 
   factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);

@@ -66,7 +66,7 @@ class SearchSessionBottomSheet extends StatelessWidget {
                     if (state.sessionSearch != null && state.sessionSearch != Session.empty())
                       GestureDetector(
                         onTap: () {
-                          context.read<SessionBloc>().add(SessionJoined(state.sessionSearch!.id));
+                          context.read<SessionBloc>().add(SessionJoined(state.sessionSearch!.id!));
                           Navigator.of(context).pop();
                         },
                         child: ListTile(
