@@ -42,6 +42,7 @@ class _AppState extends State<App> {
         builder: (context) {
           router ??= AppRouter(navigatorKey: navigatorKey, appBloc: context.read<AppBloc>());
           return MaterialApp.router(
+            debugShowCheckedModeBanner: false,
             routerConfig: router?.router,
             theme: ThemeData(
               visualDensity: VisualDensity.adaptivePlatformDensity,
