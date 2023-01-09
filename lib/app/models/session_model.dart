@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
@@ -57,12 +59,23 @@ class Session extends Equatable {
     );
   }
 
-  String sessionMeasurementAverage({required int average, required bool shirtSizes}) {
-    if (shirtSizes) {
-      return tShirtSizes.length < average ? tShirtSizes.last : tShirtSizes[average];
+  String get sessionMeasurementAverage {
+    if (isShirtSizes ?? true) {
+      return tShirtSizes.length < sessionAverageValue ? tShirtSizes.last : tShirtSizes[sessionAverageValue];
     } else {
-      return taskSizes.length < average ? taskSizes.last : taskSizes[average];
+      return taskSizes.length < sessionAverageValue ? taskSizes.last : taskSizes[sessionAverageValue];
     }
+  }
+
+  int get selectionsNotLockedIn {
+    return selections?.where((element) => !element.lockedIn!).length ?? 0;
+  }
+
+  int get sessionAverageValue {
+    final List<Selection> selections = this.selections ?? [];
+    final List<int> values = selections.map((e) => e.cardSelected!).toList();
+    final int sum = values.reduce((value, element) => value);
+    return (sum / values.length).round();
   }
 
   factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);

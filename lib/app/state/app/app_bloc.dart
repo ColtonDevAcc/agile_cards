@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/repositories/authentication_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -8,7 +7,6 @@ import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 part 'app_event.dart';
 part 'app_state.dart';

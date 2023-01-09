@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';

@@ -1,6 +1,7 @@
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
+import 'package:agile_cards/features/session/widgets/atoms/agile_card.dart';
 import 'package:agile_cards/features/session/widgets/atoms/agile_card_selector.dart';
 import 'package:flutter/material.dart';
 
@@ -13,14 +14,13 @@ class SessionParticipantView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int notLockedInCount = session.selections?.where((element) => !element.lockedIn!).length ?? 0;
     final isShirtSizes = session.isShirtSizes ?? true;
     return Expanded(
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Text('Waiting for $notLockedInCount participants'),
+            child: Text('Waiting for ${session.selectionsNotLockedIn} participants'),
           ),
           if (session.cardsRevealed == false || session.cardsRevealed == null)
             Expanded(

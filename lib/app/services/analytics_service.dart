@@ -35,7 +35,10 @@ class AnalyticsService extends NavigatorObserver {
   }
 
   Future<void> logEvent({required String name, Map<String, dynamic>? parameters}) async {
-    if (debug) log("event logged: name: $name parameters: $parameters");
+    if (debug) {
+      log("event logged: name: $name parameters: $parameters");
+      return;
+    }
 
     await analytics.logEvent(name: name, parameters: parameters);
   }
@@ -43,6 +46,7 @@ class AnalyticsService extends NavigatorObserver {
   Future<void> logError({required String exception, StackTrace? stacktrace, required String reason, bool? fatal}) async {
     if (debug) {
       log("error logged: exception: $exception, stacktrace: $stacktrace, reason: $reason, fatal: $fatal");
+      return;
     }
 
     await crashlytics.recordError(
