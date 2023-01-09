@@ -105,27 +105,25 @@ class LoginPage extends StatelessWidget {
                       const Spacer(),
                       Align(
                         alignment: Alignment.bottomCenter,
-                        child: SafeArea(
-                          child: AutoSizeText.rich(
-                            TextSpan(
-                              text: 'By continuing, you agree to our\n',
-                              style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
-                              children: [
-                                TextSpan(
-                                  text: 'Terms of Service',
-                                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                                ),
-                                const TextSpan(text: ' and '),
-                                TextSpan(
-                                  text: 'Privacy Policy',
-                                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                                ),
-                              ],
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            maxFontSize: 16,
+                        child: AutoSizeText.rich(
+                          TextSpan(
+                            text: 'By continuing, you agree to our\n',
+                            style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+                            children: [
+                              TextSpan(
+                                text: 'Terms of Service',
+                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                              ),
+                              const TextSpan(text: ' and '),
+                              TextSpan(
+                                text: 'Privacy Policy',
+                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                              ),
+                            ],
                           ),
+                          textAlign: TextAlign.center,
+                          maxFontSize: 18,
+                          minFontSize: 11,
                         ),
                       )
                     ],
