@@ -34,13 +34,13 @@ class DynamicLinkService {
     final dynamicLinkParams = DynamicLinkParameters(
       link: Uri.parse("https://agilecards.page.link${routeToContent ?? "/"}"),
       uriPrefix: "https://agilecards.page.link",
-      androidParameters: const AndroidParameters(
-        // fallbackUrl: Uri.parse("https://play.google.com/store/apps/details?id=org.motb.mobile.museumofthebible"),
+      androidParameters: AndroidParameters(
+        fallbackUrl: Uri.parse("https://apps.apple.com/us/app/agile-cards-sprint-planning/id1662639002"),
         packageName: "com.voostack.agilecardssprintplanning",
         minimumVersion: 1,
       ),
-      iosParameters: const IOSParameters(
-        // fallbackUrl: Uri.parse("https://apps.apple.com/us/app/museum-of-the-bible-discover/id1591251658"),
+      iosParameters: IOSParameters(
+        fallbackUrl: Uri.parse("https://apps.apple.com/us/app/agile-cards-sprint-planning/id1662639002"),
         bundleId: "com.voostack.agilecardssprintplanning",
         appStoreId: "1591251658",
         minimumVersion: "1.0.1",

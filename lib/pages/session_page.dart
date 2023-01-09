@@ -9,6 +9,7 @@ import 'package:agile_cards/widgets/atoms/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 
 class SessionPage extends StatelessWidget {
@@ -25,12 +26,23 @@ class SessionPage extends StatelessWidget {
         ],
         title: BlocBuilder<SessionBloc, SessionState>(
           builder: (context, state) {
-            return GestureDetector(onTap: () async => FlutterClipboard.copy(state.session.id!), child: Text(state.session.name ?? 'unnamed'));
+            return GestureDetector(
+              onTap: () async => FlutterClipboard.copy(state.session.id!).then(
+                (value) => Fluttertoast.showToast(msg: 'Session ID copied to clipboard'),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(state.session.name ?? 'unnamed'),
+                  Icon(Icons.copy, size: 12, color: Colors.white),
+                ],
+              ),
+            );
           },
         ),
       ),
       body: CustomScrollView(
-        primary: true,
         slivers: [
           SliverFillRemaining(
             child: BlocBuilder<SessionBloc, SessionState>(
