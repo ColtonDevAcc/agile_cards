@@ -18,7 +18,7 @@ class SessionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DynamicLinkService().listenForLinks(context);
+    DynamicLinkService().handleInitialLink(context);
 
     return Scaffold(
       floatingActionButton: const SessionFloatingActionButton(),
