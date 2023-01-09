@@ -157,11 +157,11 @@ class SessionRepository {
   Future<void> agileCardSelected(Selection selection) async {
     try {
       // ignore: cast_nullable_to_non_nullable
-      final Session? session = await ref.parent?.get().then((value) => Session.fromJson(Map<String, dynamic>.from(value.value as Map)));
+      final Session? session = await ref.get().then((value) => Session.fromJson(Map<String, dynamic>.from(value.value as Map)));
       final User user = FirebaseAuth.instance.currentUser!;
       final List<Selection> sessionSelection = session?.selections ?? [];
 
-      if (session != null && session.participants != null && session.participants!.contains(Participant.fromUser(user))) {
+      if (session != null && session.participants != null && !session.participants!.contains(Participant.fromUser(user))) {
         Fluttertoast.showToast(
           msg: 'you are not a participant of this session. Please rejoin',
           toastLength: Toast.LENGTH_LONG,
@@ -177,12 +177,11 @@ class SessionRepository {
       if (sessionSelection.isNotEmpty) {
         for (final s in sessionSelection) {
           b++;
-          final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
-          if (selection.userId == user.uid) {
-            await ref.child('selections').child('$a').set(sessionSelection).whenComplete(() => log('updated selection'));
+          if (s.userId == user.uid) {
+            await ref.child('selections').child('$a').set(selection.toJson()).whenComplete(() => log('updated selection'));
             return;
           } else if (a - b != 1 && b != 0) {
-            await ref.child('selections').child('$b').set(sessionSelection).whenComplete(() => log('updated selection'));
+            await ref.child('selections').child('$b').set(selection.toJson()).whenComplete(() => log('updated selection'));
             return;
           }
           a++;
@@ -192,7 +191,7 @@ class SessionRepository {
       if (sessionSelection.isEmpty) {
         await ref.child('selections').set([selection.toJson()]).whenComplete(() => log('added first selection'));
       } else {
-        await ref.child('selections').child('${sessionSelection.length}').set(sessionSelection).whenComplete(() => log('added selection'));
+        await ref.child('selections').child('${sessionSelection.length}').set(selection.toJson()).whenComplete(() => log('added selection'));
       }
       locator<AnalyticsService>().logEvent(
         name: 'selected_agile_card',

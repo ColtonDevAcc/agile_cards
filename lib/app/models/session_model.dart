@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
@@ -66,7 +68,8 @@ class Session extends Equatable {
   }
 
   int get selectionsNotLockedIn {
-    return selections?.where((element) => element.lockedIn ?? false).length ?? 0;
+    if (selections == null || selections!.isEmpty) return 0;
+    return selections!.where((element) => element.lockedIn == false || element.lockedIn == null).length;
   }
 
   int get sessionAverageValue {
