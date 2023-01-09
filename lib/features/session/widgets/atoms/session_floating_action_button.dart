@@ -27,7 +27,7 @@ class SessionFloatingActionButton extends StatelessWidget {
                           socialMediaTitle: 'Join my session',
                           content: 'you can join my agile cards sessions with my code: ${state.session.id}',
                           source: 'session_page',
-                          routeToContent: '/session_page/${state.session.id}',
+                          routeToContent: '/session/${state.session.id}',
                           share: true,
                         );
                       },

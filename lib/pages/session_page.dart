@@ -1,4 +1,5 @@
 import 'package:agile_cards/app/models/session_model.dart';
+import 'package:agile_cards/app/services/dynamic_linking.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
 import 'package:agile_cards/features/session/views/session_owner_view.dart';
@@ -17,6 +18,8 @@ class SessionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DynamicLinkService().listenForLinks(context);
+
     return Scaffold(
       floatingActionButton: const SessionFloatingActionButton(),
       appBar: AppBar(
@@ -35,7 +38,7 @@ class SessionPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(state.session.name ?? 'unnamed'),
-                  Icon(Icons.copy, size: 12, color: Colors.white),
+                  const Icon(Icons.copy, size: 12, color: Colors.white),
                 ],
               ),
             );

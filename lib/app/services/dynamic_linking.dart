@@ -1,6 +1,9 @@
 import 'dart:developer';
+import 'package:agile_cards/app/state/app/app_bloc.dart';
+import 'package:agile_cards/app/state/session/session_bloc.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -54,6 +57,22 @@ class DynamicLinkService {
 
     if (share == true) {
       Share.share('join with my session $link', subject: 'join my agile cards session');
+    }
+  }
+
+  Future<void> handleInitialLink(BuildContext context) async {
+    final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
+    if (initialLink != null) {
+      if (initialLink.link.path == "/session") {
+        final sessionId = initialLink.link.path.split('/session/')[1];
+
+        // ignore: use_build_context_synchronously
+        context.read<SessionBloc>().add(SessionJoined(sessionId));
+        return;
+      }
+
+      // ignore: use_build_context_synchronously
+      GoRouter.of(context).pushNamed(initialLink.link.path);
     }
   }
 }
