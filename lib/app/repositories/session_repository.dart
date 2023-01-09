@@ -7,6 +7,8 @@ import 'package:agile_cards/app/services/analytics_service.dart';
 import 'package:agile_cards/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SessionRepository {
   DatabaseReference ref = FirebaseDatabase.instance.ref("sessions/${FirebaseAuth.instance.currentUser!.uid}");
@@ -154,40 +156,50 @@ class SessionRepository {
 
   Future<void> agileCardSelected(Selection selection) async {
     try {
-      final ref = this.ref.child('selections');
-      final Object? data = await ref.get().then((value) => value.child('selections').value);
-      final sessionSelection = selection.toJson();
+      // ignore: cast_nullable_to_non_nullable
+      final Session? session = await ref.parent?.get().then((value) => Session.fromJson(Map<String, dynamic>.from(value.value as Map)));
       final User user = FirebaseAuth.instance.currentUser!;
-      final int length = data == null ? 0 : (data as List).length;
+      final List<Selection> sessionSelection = session?.selections ?? [];
+
+      if (session != null && session.participants != null && session.participants!.contains(Participant.fromUser(user))) {
+        Fluttertoast.showToast(
+          msg: 'you are not a participant of this session. Please rejoin',
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.red,
+          timeInSecForIosWeb: 3,
+        );
+
+        return;
+      }
 
       int b = 0;
       int a = 0;
-      if (data != null) {
-        for (final s in data as List) {
+      if (sessionSelection.isNotEmpty) {
+        for (final s in sessionSelection) {
           b++;
           final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
           if (selection.userId == user.uid) {
-            await ref.child('$a').set(sessionSelection).whenComplete(() => log('updated selection'));
+            await ref.child('selections').child('$a').set(sessionSelection).whenComplete(() => log('updated selection'));
             return;
           } else if (a - b != 1 && b != 0) {
-            await ref.child('$b').set(sessionSelection).whenComplete(() => log('updated selection'));
+            await ref.child('selections').child('$b').set(sessionSelection).whenComplete(() => log('updated selection'));
             return;
           }
           a++;
         }
       }
 
-      if (data == null || length == 0) {
-        await ref.set([sessionSelection]).whenComplete(() => log('added first selection'));
+      if (sessionSelection.isEmpty) {
+        await ref.child('selections').set([selection.toJson()]).whenComplete(() => log('added first selection'));
       } else {
-        await ref.child('$length').set(sessionSelection).whenComplete(() => log('added selection'));
+        await ref.child('selections').child('${sessionSelection.length}').set(sessionSelection).whenComplete(() => log('added selection'));
       }
       locator<AnalyticsService>().logEvent(
         name: 'selected_agile_card',
         parameters: {'agile_card_selected': selection.cardSelected},
       );
-    } catch (e) {
-      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'agile_card_selected', stacktrace: StackTrace.current);
+    } catch (e, st) {
+      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'agile_card_selected', stacktrace: st);
     }
   }
 
@@ -233,37 +245,17 @@ class SessionRepository {
           return;
         }
 
-        if (sessionResult.participants == null || sessionResult.participants!.isEmpty) {
-          return;
+        //remove participant
+        sessionResult.participants?.removeWhere((element) => element.id == user.uid);
+
+        //remove selection
+        if (sessionResult.selections != null) {
+          sessionResult.selections?.removeWhere((element) => element.userId == user.uid);
         }
 
-        for (final p in sessionResult.participants ?? []) {
-          final participant = p as Participant;
-          if (participant.id == user.uid) {
-            final updatedSession = sessionResult.copyWith(
-              participants: sessionResult.participants!.where((element) => element.id != user.uid).toList(),
+        await ref.update(sessionResult.toJson()).whenComplete(
+              () => ref = FirebaseDatabase.instance.ref("sessions/${FirebaseAuth.instance.currentUser!.uid}"),
             );
-
-            //remove selections if they exist
-            // ignore: cast_nullable_to_non_nullable
-            final List? selections = await ref.get().then((value) => value.child('selections').value as List?);
-            if (selections != null && selections.isNotEmpty) {
-              final List<Selection> newList = selections.map((e) => Selection.fromJson(Map<String, dynamic>.from(e as Map))).toList();
-              newList.removeWhere((element) => element.userId == user.uid);
-              log("selections $newList");
-
-              if (newList.isEmpty) {
-                await ref.child('selections').remove();
-                return;
-              }
-
-              await ref.child('selections').set(selections);
-            }
-
-            await ref.update(updatedSession.toJson());
-            return;
-          }
-        }
       }
       locator<AnalyticsService>().logEvent(
         name: 'leave_session',

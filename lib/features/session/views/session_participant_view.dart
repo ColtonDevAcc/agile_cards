@@ -20,7 +20,11 @@ class SessionParticipantView extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Text('Waiting for ${session.selectionsNotLockedIn} participants'),
+            child: Text(
+              session.cardsRevealed != true
+                  ? 'Waiting for ${session.selectionsNotLockedIn} participants'
+                  : 'average score is ${session.sessionMeasurementAverage}',
+            ),
           ),
           if (session.cardsRevealed == false || session.cardsRevealed == null)
             Expanded(

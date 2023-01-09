@@ -23,6 +23,8 @@ dependencies:
   form_field_validator: ^1.1.0
   share_plus: ^6.3.0
   image_picker: ^0.8.6
+  flutter_svg: ^1.1.6
+  flutter_launcher_icons: ^0.11.0
 
   # state
   flutter_bloc: ^8.1.1
@@ -70,3 +72,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
+    - assets/icons/

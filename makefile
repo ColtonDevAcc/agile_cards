@@ -18,4 +18,6 @@ lint:
 test:
 	flutter test
 
+icon: 
+	flutter pub get && flutter pub run flutter_launcher_icons
 # Path: makefile

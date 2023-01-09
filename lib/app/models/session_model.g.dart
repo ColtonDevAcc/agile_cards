@@ -7,7 +7,7 @@ part of 'session_model.dart';
 // **************************************************************************
 
 Session _$SessionFromJson(Map json) => Session(
-      id: json['id'] as String,
+      id: json['id'] as String?,
       cardsRevealed: json['cardsRevealed'] as bool?,
       selections: (json['selections'] as List<dynamic>?)
           ?.map((e) => Selection.fromJson(Map<String, dynamic>.from(e as Map)))

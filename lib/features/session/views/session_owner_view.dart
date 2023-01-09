@@ -16,9 +16,10 @@ class SessionOwnerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Selection> selections = session.selections ?? [];
-    final int notLockedInCount = selections.where((element) => !element.lockedIn!).length;
+    final int notLockedInCount = session.selectionsNotLockedIn;
     final Selection ownerSelection = selections.firstWhere((element) => element.userId == session.owner, orElse: () => Selection.empty());
     final bool cardsRevealed = session.cardsRevealed ?? false;
+    final bool ownerLockedIn = ownerSelection.lockedIn ?? false;
 
     return Expanded(
       child: Column(
@@ -38,15 +39,14 @@ class SessionOwnerView extends StatelessWidget {
               },
             ),
           const SizedBox(height: 20),
-          if (ownerSelection == Selection.empty() || ownerSelection.lockedIn!)
-            ParticipantCardSelectionList(session: session, cardsRevealed: cardsRevealed),
+          if (ownerSelection == Selection.empty() || ownerLockedIn) ParticipantCardSelectionList(session: session, cardsRevealed: cardsRevealed),
           if (session.participants?.contains(context.read<AppBloc>().state.user) ?? false)
             Expanded(
               child: Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: Text(ownerSelection.lockedIn! ? 'you selected' : 'select your card'),
+                    child: Text(ownerLockedIn ? 'you selected' : 'select your card'),
                   ),
                   Expanded(
                     child: AgileCardSelector(
@@ -59,13 +59,5 @@ class SessionOwnerView extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  int sessionAverageValue() {
-    final List<Selection> selections = session.selections ?? [];
-    final List<int> values = selections.map((e) => e.cardSelected!).toList();
-    final int sum = values.reduce((value, element) => value);
-
-    return (sum / values.length).round();
   }
 }

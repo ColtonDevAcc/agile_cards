@@ -7,9 +7,9 @@ part of 'selection_model.dart';
 // **************************************************************************
 
 Selection _$SelectionFromJson(Map json) => Selection(
-      userId: json['userId'] as String,
-      cardSelected: json['cardSelected'] as int,
-      lockedIn: json['lockedIn'] as bool,
+      userId: json['userId'] as String?,
+      cardSelected: json['cardSelected'] as int?,
+      lockedIn: json['lockedIn'] as bool?,
     );
 
 const _$SelectionFieldMap = <String, String>{

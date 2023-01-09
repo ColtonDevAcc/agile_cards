@@ -6,26 +6,18 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'selection_model.g.dart';
 
-@JsonSerializable(anyMap: true, createFieldMap: true)
+@JsonSerializable(anyMap: true, createFieldMap: true, explicitToJson: true)
 class Selection extends Equatable {
   final String? userId;
   final int? cardSelected;
   final bool? lockedIn;
 
-  const Selection({
-    this.userId,
-    this.cardSelected,
-    this.lockedIn,
-  });
+  const Selection({this.userId, this.cardSelected, this.lockedIn});
 
   @override
   List<Object?> get props => [userId, cardSelected, lockedIn];
 
-  Selection copyWith({
-    String? userId,
-    int? cardSelected,
-    bool? lockedIn,
-  }) {
+  Selection copyWith({String? userId, int? cardSelected, bool? lockedIn}) {
     return Selection(
       userId: userId ?? this.userId,
       cardSelected: cardSelected ?? this.cardSelected,

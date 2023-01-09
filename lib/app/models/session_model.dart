@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
@@ -68,12 +66,12 @@ class Session extends Equatable {
   }
 
   int get selectionsNotLockedIn {
-    return selections?.where((element) => !element.lockedIn!).length ?? 0;
+    return selections?.where((element) => element.lockedIn ?? false).length ?? 0;
   }
 
   int get sessionAverageValue {
     final List<Selection> selections = this.selections ?? [];
-    final List<int> values = selections.map((e) => e.cardSelected!).toList();
+    final List<int> values = selections.map((e) => e.cardSelected ?? 0).toList();
     final int sum = values.reduce((value, element) => value);
     return (sum / values.length).round();
   }

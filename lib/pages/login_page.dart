@@ -4,6 +4,7 @@ import 'package:agile_cards/pages/primary_textfield.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -19,7 +20,12 @@ class LoginPage extends StatelessWidget {
             child: Column(
               children: [
                 Container(
+                  alignment: Alignment.topCenter,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   height: MediaQuery.of(context).size.height * 0.5,
+                  child: SafeArea(
+                    child: SvgPicture.asset('assets/AgileCardsSprintPlanning.svg'),
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 20),

@@ -51,9 +51,9 @@ class _AppState extends State<App> {
               backgroundColor: const Color.fromRGBO(33, 39, 58, 1),
               colorScheme: const ColorScheme(
                 brightness: Brightness.dark,
-                primary: Color.fromRGBO(83, 119, 234, 1),
+                primary: Color.fromRGBO(255, 0, 73, 1),
                 onPrimary: Color.fromRGBO(215, 221, 237, 1),
-                secondary: Color.fromRGBO(92, 194, 115, 1),
+                secondary: Color.fromRGBO(63, 136, 197, 1),
                 onSecondary: Colors.white,
                 error: Colors.red,
                 onError: Colors.white,
