@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -11,18 +10,24 @@ class DynamicLinkService {
   Uri? previousLink;
 
   void listenForLinks(BuildContext context) {
-    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-      if (previousLink != dynamicLinkData.link) {
-        try {
-          previousLink = dynamicLinkData.link;
-          GoRouter.of(context).pushNamed(dynamicLinkData.link.path);
-        } catch (e) {
-          log("====================\n error pushing route $e /n====================");
+    FirebaseDynamicLinks.instance.onLink.listen(
+      (dynamicLinkData) {
+        final uri = dynamicLinkData.link;
+        if (uri != previousLink) {
+          previousLink = uri;
+
+          if (uri.pathSegments.contains('session')) {
+            context.read<SessionBloc>().add(SessionJoined(uri.pathSegments.last));
+            return;
+          }
+
+          context.go(uri.path);
         }
-      } else {
-        log("====================\n pressedOnDuplicateLinks  /n====================");
-      }
-    });
+      },
+      onError: (error) {
+        log('Dynamic link error: $error');
+      },
+    );
   }
 
   Future<void> buildDynamicLink({
@@ -63,9 +68,10 @@ class DynamicLinkService {
   Future<void> handleInitialLink(BuildContext context) async {
     final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
     if (initialLink != null) {
+      log('====================\n initialLink ${initialLink.link.path} /n====================');
       if (initialLink.link.path == "/session") {
         final sessionId = initialLink.link.path.split('/session/')[1];
-
+        log('====================\n sessionId $sessionId /n====================');
         // ignore: use_build_context_synchronously
         context.read<SessionBloc>().add(SessionJoined(sessionId));
         return;
