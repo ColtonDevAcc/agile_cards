@@ -55,7 +55,15 @@ class DynamicLinkService {
       ),
       navigationInfoParameters: const NavigationInfoParameters(forcedRedirectEnabled: true),
       googleAnalyticsParameters: GoogleAnalyticsParameters(source: source, medium: medium, content: content),
-      socialMetaTagParameters: socialMediaTitle == null ? null : SocialMetaTagParameters(title: socialMediaTitle, imageUrl: socialMediaImageUrl),
+      socialMetaTagParameters: socialMediaTitle == null
+          ? null
+          : SocialMetaTagParameters(
+              title: socialMediaTitle,
+              imageUrl: socialMediaImageUrl ??
+                  Uri.parse(
+                    "https://firebasestorage.googleapis.com/v0/b/agilecards-da16f.appspot.com/o/1_JPG.jpg?alt=media&token=141be1f9-20bc-4749-9808-5caca80dbe1c",
+                  ),
+            ),
     );
 
     final link = await FirebaseDynamicLinks.instance.buildLink(dynamicLinkParams);
