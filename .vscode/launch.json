@@ -10,6 +10,12 @@
       "type": "dart"
     },
     {
+      "name": "agile_cards (debug mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug"
+    },
+    {
       "name": "agile_cards (profile mode)",
       "request": "launch",
       "type": "dart",

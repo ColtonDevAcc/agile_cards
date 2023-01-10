@@ -15,7 +15,16 @@ class AnalyticsService extends NavigatorObserver {
   final FirebasePerformance performance = FirebasePerformance.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
   String currentRoute = "/";
-  AnalyticsService({required this.debug});
+  AnalyticsService({required this.debug}) {
+    if (debug) {
+      log("AnalyticsService initialized in debug mode");
+    } else {
+      log("AnalyticsService initialized in prod mode");
+      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+      FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+      FirebasePerformance.instance.setPerformanceCollectionEnabled(true);
+    }
+  }
 
   FirebaseAnalyticsObserver getAnalyticsObserver() => FirebaseAnalyticsObserver(analytics: analytics);
 
@@ -97,12 +106,19 @@ class AnalyticsService extends NavigatorObserver {
   }
 
   Future<void> logNetworkPerformance({required String url, required int time}) async {
-    if (debug) log("network performance logged: $url with time: $time");
+    if (debug) {
+      log("network performance logged: $url with time: $time");
+      return;
+    }
     await analytics.logEvent(name: 'network_performance', parameters: {'url': url, 'time': time});
   }
 
   Future<void> logLoggedIn({String? loggedInMethod}) async {
-    if (debug) log("logged in");
+    if (debug) {
+      log("logged in");
+      return;
+    }
+
     await analytics.setUserId(id: auth.currentUser!.uid);
     await analytics.logLogin(loginMethod: loggedInMethod);
   }

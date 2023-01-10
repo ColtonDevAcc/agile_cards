@@ -20,4 +20,9 @@ test:
 
 icon: 
 	flutter pub get && flutter pub run flutter_launcher_icons
-# Path: makefile
+
+pod_update:
+	cd ios && pod update
+
+pod_install:
+	cd ios && pod install

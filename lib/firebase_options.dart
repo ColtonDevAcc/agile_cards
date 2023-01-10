@@ -25,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -67,6 +64,17 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAd8lSsk2LcHAHKP4ytI6S3yRra4epcyk8',
+    appId: '1:964978059660:ios:8eb546ad69ab9710438ea9',
+    messagingSenderId: '964978059660',
+    projectId: 'agilecards-da16f',
+    databaseURL: 'https://agilecards-da16f-default-rtdb.firebaseio.com',
+    storageBucket: 'agilecards-da16f.appspot.com',
+    iosClientId: '964978059660-6fo53jtaq0qqfidbejk6bt607qqd8ue2.apps.googleusercontent.com',
+    iosBundleId: 'com.voostack.agilecardssprintplanning',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAd8lSsk2LcHAHKP4ytI6S3yRra4epcyk8',
     appId: '1:964978059660:ios:8eb546ad69ab9710438ea9',
     messagingSenderId: '964978059660',
