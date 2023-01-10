@@ -16,7 +16,7 @@ GetIt locator = GetIt.instance;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(name: 'AgileCards', options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   locator.registerLazySingleton(() => AnalyticsService(debug: kDebugMode));
   locator.registerLazySingleton(() => DynamicLinkService());
 
