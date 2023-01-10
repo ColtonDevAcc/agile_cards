@@ -3,6 +3,7 @@ import 'package:agile_cards/app/state/session/session_bloc.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -13,6 +14,7 @@ class DynamicLinkService {
     FirebaseDynamicLinks.instance.onLink.listen(
       (dynamicLinkData) {
         final uri = dynamicLinkData.link;
+
         if (uri != previousLink) {
           previousLink = uri;
 
@@ -22,6 +24,13 @@ class DynamicLinkService {
           }
 
           context.go(uri.path);
+        } else {
+          Fluttertoast.showToast(
+            msg: 'You are already tried joining this session. If you believe this is an error, please relaunch the app.',
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 3,
+            backgroundColor: Colors.red,
+          );
         }
       },
       onError: (error) {

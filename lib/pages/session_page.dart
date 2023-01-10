@@ -6,6 +6,7 @@ import 'package:agile_cards/features/session/views/session_owner_view.dart';
 import 'package:agile_cards/features/session/views/session_participant_view.dart';
 import 'package:agile_cards/features/session/widgets/atoms/session_floating_action_button.dart';
 import 'package:agile_cards/features/login/widgets/atom/primary_button.dart';
+import 'package:agile_cards/main.dart';
 import 'package:agile_cards/widgets/atoms/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +19,7 @@ class SessionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DynamicLinkService().listenForLinks(context);
+    locator<DynamicLinkService>().listenForLinks(context);
 
     return Scaffold(
       floatingActionButton: const SessionFloatingActionButton(),

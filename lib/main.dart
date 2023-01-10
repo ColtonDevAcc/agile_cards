@@ -1,5 +1,6 @@
 import 'package:agile_cards/app/routing/router.dart';
 import 'package:agile_cards/app/services/analytics_service.dart';
+import 'package:agile_cards/app/services/dynamic_linking.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,6 +13,7 @@ import 'package:get_it/get_it.dart';
 import 'firebase_options.dart';
 
 GetIt locator = GetIt.instance;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -21,6 +23,8 @@ Future<void> main() async {
   );
 
   locator.registerLazySingleton(() => AnalyticsService(debug: kDebugMode));
+  locator.registerLazySingleton(() => DynamicLinkService());
+
   runApp(const App());
 }
 
