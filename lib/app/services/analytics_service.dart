@@ -15,18 +15,7 @@ class AnalyticsService extends NavigatorObserver {
   final FirebasePerformance performance = FirebasePerformance.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
   String currentRoute = "/";
-  AnalyticsService({required this.debug}) {
-    if (!debug) {
-      performance.setPerformanceCollectionEnabled(true);
-      crashlytics.setCrashlyticsCollectionEnabled(true);
-      analytics.setAnalyticsCollectionEnabled(true);
-      log('AnalyticsService initialized');
-    } else {
-      performance.setPerformanceCollectionEnabled(false);
-      crashlytics.setCrashlyticsCollectionEnabled(false);
-      analytics.setAnalyticsCollectionEnabled(false);
-    }
-  }
+  AnalyticsService({required this.debug});
 
   FirebaseAnalyticsObserver getAnalyticsObserver() => FirebaseAnalyticsObserver(analytics: analytics);
 
