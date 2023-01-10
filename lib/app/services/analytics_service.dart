@@ -20,6 +20,7 @@ class AnalyticsService extends NavigatorObserver {
       performance.setPerformanceCollectionEnabled(true);
       crashlytics.setCrashlyticsCollectionEnabled(true);
       analytics.setAnalyticsCollectionEnabled(true);
+      log('AnalyticsService initialized');
     } else {
       performance.setPerformanceCollectionEnabled(false);
       crashlytics.setCrashlyticsCollectionEnabled(false);
@@ -62,7 +63,7 @@ class AnalyticsService extends NavigatorObserver {
     RequestOptions? dioOptions;
     HttpMetric? metric;
 
-    if (!kDebugMode) {
+    if (!debug) {
       try {
         dio.interceptors.add(
           InterceptorsWrapper(
