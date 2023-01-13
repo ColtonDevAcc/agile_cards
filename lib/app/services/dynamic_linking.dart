@@ -52,7 +52,7 @@ class DynamicLinkService {
       link: Uri.parse("https://agilecards.page.link${routeToContent ?? "/"}"),
       uriPrefix: "https://agilecards.page.link",
       androidParameters: AndroidParameters(
-        fallbackUrl: Uri.parse("https://apps.apple.com/us/app/agile-cards-sprint-planning/id1662639002"),
+        fallbackUrl: Uri.parse("https://play.google.com/store/apps/details?id=com.voostack.agilecardssprintplanning"),
         packageName: "com.voostack.agilecardssprintplanning",
         minimumVersion: 1,
       ),
