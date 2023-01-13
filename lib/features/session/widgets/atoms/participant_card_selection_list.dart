@@ -1,4 +1,5 @@
 import 'package:agile_cards/app/models/participant_model.dart';
+import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/features/session/widgets/atoms/agile_card.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +16,11 @@ class ParticipantCardSelectionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<Selection> selections = session.selections ?? [];
+
     return Wrap(
       children: [
-        for (final selection in session.selections ?? [])
+        for (final selection in selections)
           AgileCard(
             reveal: cardsRevealed == true,
             measurement: session.sessionMeasurementAverage,

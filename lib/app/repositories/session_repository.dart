@@ -204,24 +204,26 @@ class SessionRepository {
 
   Future<void> agileCardDeselected() async {
     try {
-      final ref = this.ref.child('selections');
       final Object? data = await ref.get().then((value) => value.child('selections').value);
       final User user = FirebaseAuth.instance.currentUser!;
-
       if (data != null) {
         int i = 0;
         for (final s in data as List) {
-          i++;
           final selection = Selection.fromJson(Map<String, dynamic>.from(s as Map));
+          log('${selection.copyWith(lockedIn: false).toJson()}');
           if (selection.userId == user.uid) {
             await ref
-                .child('${i - 1}')
+                .child('selections')
+                .child('$i')
                 .update(selection.copyWith(lockedIn: false).toJson())
                 .onError((error, stackTrace) => log('error removing card selection $error'))
                 .whenComplete(() => log('removed selection'));
             return;
           }
         }
+        i++;
+      } else {
+        log('no selection found');
       }
       locator<AnalyticsService>().logEvent(name: 'deselect_agile_card');
     } catch (e) {

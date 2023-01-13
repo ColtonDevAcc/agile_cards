@@ -21,43 +21,41 @@ class SessionOwnerView extends StatelessWidget {
     final bool cardsRevealed = session.cardsRevealed ?? false;
     final bool ownerLockedIn = ownerSelection.lockedIn ?? false;
 
-    return Expanded(
-      child: Column(
-        children: [
-          if (notLockedInCount != 0)
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Text('Waiting for $notLockedInCount participants'),
-            ),
-          if (notLockedInCount == 0 && cardsRevealed == true) SessionAverageText(sessionMeasurementAverage: session.sessionMeasurementAverage),
-          if (notLockedInCount == 0 && selections.isNotEmpty)
-            PrimaryButton(
-              title: cardsRevealed == false ? 'Reveal' : 'Hide',
-              onPressed: () {
-                // ignore: avoid_bool_literals_in_conditional_expressions
-                context.read<SessionBloc>().add(SessionRevealCards(reveal: cardsRevealed == false ? true : false));
-              },
-            ),
-          const SizedBox(height: 20),
-          if (ownerSelection == Selection.empty() || ownerLockedIn) ParticipantCardSelectionList(session: session, cardsRevealed: cardsRevealed),
-          if (session.participants?.contains(context.read<AppBloc>().state.user) ?? false)
-            Expanded(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text(ownerLockedIn ? 'you selected' : 'select your card'),
+    return Column(
+      children: [
+        if (notLockedInCount != 0)
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Text('Waiting for $notLockedInCount participants'),
+          ),
+        if (notLockedInCount == 0 && cardsRevealed == true) SessionAverageText(sessionMeasurementAverage: session.sessionMeasurementAverage),
+        if (notLockedInCount == 0 && selections.isNotEmpty)
+          PrimaryButton(
+            title: cardsRevealed == false ? 'Reveal' : 'Hide',
+            onPressed: () {
+              // ignore: avoid_bool_literals_in_conditional_expressions
+              context.read<SessionBloc>().add(SessionRevealCards(reveal: cardsRevealed == false ? true : false));
+            },
+          ),
+        const SizedBox(height: 20),
+        if (ownerSelection == Selection.empty() || ownerLockedIn) ParticipantCardSelectionList(session: session, cardsRevealed: cardsRevealed),
+        if (session.participants?.contains(context.read<AppBloc>().state.user) ?? false)
+          Expanded(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(ownerLockedIn ? 'you selected' : 'select your card'),
+                ),
+                Expanded(
+                  child: AgileCardSelector(
+                    selections: session.selections ?? [],
                   ),
-                  Expanded(
-                    child: AgileCardSelector(
-                      selections: session.selections ?? [],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

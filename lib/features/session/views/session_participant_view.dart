@@ -15,39 +15,37 @@ class SessionParticipantView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isShirtSizes = session.isShirtSizes ?? true;
-    return Expanded(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Text(
-              session.cardsRevealed != true
-                  ? 'Waiting for ${session.selectionsNotLockedIn} participants'
-                  : 'average score is ${session.sessionMeasurementAverage}',
-            ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            session.cardsRevealed != true
+                ? 'Waiting for ${session.selectionsNotLockedIn} participants'
+                : 'average score is ${session.sessionMeasurementAverage}',
           ),
-          if (session.cardsRevealed == false || session.cardsRevealed == null)
-            Expanded(
-              child: AgileCardSelector(
-                selections: session.selections ?? [],
-              ),
-            )
-          else
-            Wrap(
-              children: [
-                for (final selection in session.selections ?? [])
-                  AgileCard(
-                    reveal: true,
-                    measurement: isShirtSizes ? tShirtSizes[selection.cardSelected] : taskSizes[selection.cardSelected],
-                    participant: session.participants?.singleWhere(
-                      (element) => element.id == selection.userId,
-                      orElse: () => Participant.empty(),
-                    ),
-                  ),
-              ],
+        ),
+        if (session.cardsRevealed == false || session.cardsRevealed == null)
+          Expanded(
+            child: AgileCardSelector(
+              selections: session.selections ?? [],
             ),
-        ],
-      ),
+          )
+        else
+          Wrap(
+            children: [
+              for (final selection in session.selections ?? [])
+                AgileCard(
+                  reveal: true,
+                  measurement: isShirtSizes ? tShirtSizes[selection.cardSelected] : taskSizes[selection.cardSelected],
+                  participant: session.participants?.singleWhere(
+                    (element) => element.id == selection.userId,
+                    orElse: () => Participant.empty(),
+                  ),
+                ),
+            ],
+          ),
+      ],
     );
   }
 }

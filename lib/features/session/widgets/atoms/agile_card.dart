@@ -17,7 +17,7 @@ class AgileCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         alignment: Alignment.center,
-        width: 200,
+        width: MediaQuery.of(context).size.width * 0.45,
         height: 200,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

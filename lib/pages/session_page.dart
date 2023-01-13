@@ -46,31 +46,35 @@ class SessionPage extends StatelessWidget {
           },
         ),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverFillRemaining(
-            child: BlocBuilder<SessionBloc, SessionState>(
-              builder: (context, state) {
-                return Column(
-                  mainAxisAlignment: state.session == Session.empty() ? MainAxisAlignment.center : MainAxisAlignment.start,
-                  children: [
-                    if (state.session == Session.empty())
-                      Center(
-                        child: PrimaryButton(
-                          title: 'Create Session',
-                          onPressed: () => context.read<SessionBloc>().add(SessionCreated(context.read<AppBloc>().state.user!)),
-                        ),
-                      )
-                    else if (state.session.owner! != context.read<AppBloc>().state.user?.id)
-                      SessionParticipantView(session: state.session)
-                    else
-                      SessionOwnerView(session: state.session)
-                  ],
-                );
-              },
-            ),
-          )
-        ],
+      body: SingleChildScrollView(
+        child: BlocBuilder<SessionBloc, SessionState>(
+          builder: (context, state) {
+            return Column(
+              mainAxisAlignment: state.session == Session.empty() ? MainAxisAlignment.center : MainAxisAlignment.start,
+              children: [
+                if (state.session == Session.empty())
+                  Center(
+                    child: PrimaryButton(
+                      title: 'Create Session',
+                      onPressed: () => context.read<SessionBloc>().add(SessionCreated(context.read<AppBloc>().state.user!)),
+                    ),
+                  )
+                else if (state.session.owner! != context.read<AppBloc>().state.user?.id)
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: SessionParticipantView(session: state.session),
+                  )
+                else
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: SessionOwnerView(
+                      session: state.session,
+                    ),
+                  )
+              ],
+            );
+          },
+        ),
       ),
     );
   }
