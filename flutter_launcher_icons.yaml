@@ -5,7 +5,9 @@ flutter_icons:
   android: 'launcher_icon'
   ios: true
   image_path: 'assets/icons/AgileCardsIcon.png'
+  image_path_android: 'assets/icons/ic_launcher.png'
   min_sdk_android: 21 # android min sdk min:16, default 21
-  adaptive_icon_background: '#FFFFFF'
+  adaptive_icon_background: '#202837'
+  adaptive_background_color: '#202837'
   remove_alpha_ios: true
-  background: true
+  adaptive_round_image: assets/icons/ic_launcher.png
