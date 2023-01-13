@@ -7,8 +7,8 @@ part of 'participant_model.dart';
 // **************************************************************************
 
 Participant _$ParticipantFromJson(Map json) => Participant(
-      id: json['id'] as String,
-      email: json['email'] as String,
+      id: json['id'] as String?,
+      email: json['email'] as String?,
       name: json['name'] as String?,
       imageUrl: json['imageUrl'] as String?,
       phone: json['phone'] as String?,
