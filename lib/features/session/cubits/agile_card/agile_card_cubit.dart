@@ -9,9 +9,9 @@ class AgileCardCubit extends Cubit<AgileCardState> {
   AgileCardCubit() : super(AgileCardState(controller: FlipCardController(), reveal: false));
 
   void setReveal({required bool reveal}) {
-    if (cardKey.currentState?.isFront == true && reveal == true) {
+    if (cardKey.currentState?.isFront == true && reveal == false) {
       cardKey.currentState?.toggleCard();
-    } else if (cardKey.currentState?.isFront == false && reveal == false) {
+    } else if (cardKey.currentState?.isFront == false && reveal == true) {
       cardKey.currentState?.toggleCard();
     }
     emit(state.copyWith(reveal: reveal));

@@ -7,10 +7,7 @@ import 'package:flutter/material.dart';
 
 class SessionParticipantView extends StatelessWidget {
   final Session session;
-  const SessionParticipantView({
-    Key? key,
-    required this.session,
-  }) : super(key: key);
+  const SessionParticipantView({Key? key, required this.session}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
