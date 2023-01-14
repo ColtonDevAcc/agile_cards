@@ -73,7 +73,7 @@ class AnalyticsService extends NavigatorObserver {
                   (element) => element.name.toLowerCase() == dioOptions!.method.toLowerCase(),
                 ),
               );
-              metric!.start();
+              await metric!.start();
               handler.next(options);
             },
             onResponse: (response, handler) async {
@@ -81,6 +81,7 @@ class AnalyticsService extends NavigatorObserver {
                 ..responsePayloadSize = response.data.length
                 ..responseContentType = response.headers.value('content-type')
                 ..responsePayloadSize = response.data.length
+                // ignore: unawaited_futures
                 ..stop();
               if (debug) log("network performance logged: ${dioOptions?.path} with time");
               handler.next(response);
@@ -90,6 +91,7 @@ class AnalyticsService extends NavigatorObserver {
                 ..responsePayloadSize = e.response?.data.length ?? 0
                 ..responseContentType = e.response?.headers.value('content-type')
                 ..responsePayloadSize = e.response?.data.length ?? 0
+                // ignore: unawaited_futures
                 ..stop();
               handler.next(e);
             },
@@ -98,7 +100,7 @@ class AnalyticsService extends NavigatorObserver {
       } catch (e) {
         final error = e;
         if (debug) log("error adding dio wrapper");
-        locator<AnalyticsService>().logError(exception: error.toString(), reason: 'error adding dio wrapper');
+        await locator<AnalyticsService>().logError(exception: error.toString(), reason: 'error adding dio wrapper');
       }
     }
 

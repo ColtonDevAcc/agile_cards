@@ -26,17 +26,12 @@ class SessionParticipantView extends StatelessWidget {
           ),
         ),
         if (session.cardsRevealed == false || session.cardsRevealed == null)
-          Expanded(
-            child: AgileCardSelector(
-              selections: session.selections ?? [],
-            ),
-          )
+          const Expanded(child: AgileCardSelector())
         else
           Wrap(
             children: [
               for (final selection in session.selections ?? [])
                 AgileCard(
-                  reveal: true,
                   measurement: isShirtSizes ? tShirtSizes[selection.cardSelected] : taskSizes[selection.cardSelected],
                   participant: session.participants?.singleWhere(
                     (element) => element.id == selection.userId,

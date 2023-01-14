@@ -10,7 +10,10 @@ Session _$SessionFromJson(Map json) => Session(
       id: json['id'] as String?,
       cardsRevealed: json['cardsRevealed'] as bool?,
       selections: (json['selections'] as List<dynamic>?)
-          ?.map((e) => Selection.fromJson(Map<String, dynamic>.from(e as Map)))
+          ?.map((e) => (e as Map).map(
+                (k, e) => MapEntry(k as String,
+                    Selection.fromJson(Map<String, dynamic>.from(e as Map))),
+              ))
           .toList(),
       name: json['name'] as String?,
       description: json['description'] as String?,
@@ -44,5 +47,7 @@ Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
       'owner': instance.owner,
       'imageUrl': instance.imageUrl,
       'isShirtSizes': instance.isShirtSizes,
-      'selections': instance.selections?.map((e) => e.toJson()).toList(),
+      'selections': instance.selections
+          ?.map((e) => e.map((k, e) => MapEntry(k, e.toJson())))
+          .toList(),
     };

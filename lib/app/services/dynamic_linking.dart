@@ -78,7 +78,7 @@ class DynamicLinkService {
     final link = await FirebaseDynamicLinks.instance.buildLink(dynamicLinkParams);
 
     if (share == true) {
-      Share.share('join with my session $link', subject: 'join my agile cards session');
+      await Share.share('join with my session $link', subject: 'join my agile cards session');
     }
   }
 

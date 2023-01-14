@@ -67,9 +67,7 @@ class SessionPage extends StatelessWidget {
                 else
                   SizedBox(
                     height: MediaQuery.of(context).size.height,
-                    child: SessionOwnerView(
-                      session: state.session,
-                    ),
+                    child: const SessionOwnerView(),
                   )
               ],
             );

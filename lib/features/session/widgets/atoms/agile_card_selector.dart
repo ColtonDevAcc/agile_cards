@@ -8,55 +8,55 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stacked_card_carousel/stacked_card_carousel.dart';
 
 class AgileCardSelector extends StatelessWidget {
-  final List<Selection> selections;
-  const AgileCardSelector({Key? key, required this.selections}) : super(key: key);
+  const AgileCardSelector({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final Selection userSelection = selections.firstWhere(
-      (element) => element.userId == context.read<AppBloc>().state.user!.id,
-      orElse: () => Selection.empty(),
-    );
-    final bool isShirtSizes = context.read<SessionBloc>().state.session.isShirtSizes ?? true;
-
-    return userSelection.lockedIn == false
-        ? StackedCardCarousel(
-            spaceBetweenItems: 200,
-            pageController: PageController(viewportFraction: 0.5, initialPage: userSelection.cardSelected ?? 0),
-            items: [
-              for (final selection in isShirtSizes ? tShirtSizes : taskSizes)
-                GestureDetector(
-                  onTap: () {
-                    context.read<SessionBloc>().add(
-                          SessionAgileCardSelected(
-                            Selection(
-                              cardSelected: isShirtSizes ? tShirtSizes.indexOf(selection) : taskSizes.indexOf(selection),
-                              userId: context.read<AppBloc>().state.user!.id,
-                              lockedIn: true,
-                            ),
-                          ),
-                        );
-                  },
-                  child: AgileCard(measurement: selection),
-                ),
-            ],
-          )
-        : Center(
-            child: Column(
-              children: [
-                AgileCard(
-                  measurement: const Selection().cardSelectionToMeasurement(
-                    isShirtSizes: isShirtSizes,
-                    selection: userSelection.cardSelected ?? 0,
+    return BlocBuilder<SessionBloc, SessionState>(
+      builder: (context, state) {
+        final Map<String, Selection> userSelection = state.session.selections?.singleWhere(
+              (element) => element.values.single.userId == context.read<AppBloc>().state.user!.id,
+              orElse: () => {'': Selection.empty()},
+            ) ??
+            {'': Selection.empty()};
+        final bool isShirtSizes = context.read<SessionBloc>().state.session.isShirtSizes ?? true;
+        return SizedBox(
+          width: double.infinity,
+          child: Column(
+            children: [
+              if (userSelection.values.single.lockedIn == false)
+                Expanded(
+                  child: StackedCardCarousel(
+                    spaceBetweenItems: 200,
+                    pageController: PageController(viewportFraction: 0.5, initialPage: userSelection.values.single.cardSelected ?? 0),
+                    items: [
+                      for (final selection in isShirtSizes ? tShirtSizes : taskSizes)
+                        GestureDetector(
+                          onTap: () {
+                            context.read<SessionBloc>().add(
+                                  SessionAgileCardSelected(
+                                    Selection(
+                                      cardSelected: isShirtSizes ? tShirtSizes.indexOf(selection) : taskSizes.indexOf(selection),
+                                      userId: context.read<AppBloc>().state.user!.id,
+                                      lockedIn: true,
+                                    ),
+                                  ),
+                                );
+                          },
+                          child: AgileCard(measurement: selection),
+                        ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 20),
+              if (context.read<SessionBloc>().state.session.cardsRevealed != true)
                 TextButton(
                   onPressed: () => context.read<SessionBloc>().add(const SessionAgileCardDeselected()),
                   child: const Text('change selection'),
-                )
-              ],
-            ),
-          );
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

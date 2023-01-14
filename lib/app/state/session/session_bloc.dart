@@ -67,7 +67,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   Future<void> _onSessionLoaded(SessionLoaded event, Emitter<SessionState> emit) async {}
 
   Future<void> _onSessionJoined(SessionJoined event, Emitter<SessionState> emit) async {
-    sessionRepository.joinSession(event.id);
+    await sessionRepository.joinSession(event.id);
   }
 
   Future<void> _onSessionChanged(SessionChanged event, Emitter<SessionState> emit) async {

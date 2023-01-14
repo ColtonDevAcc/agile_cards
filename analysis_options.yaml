@@ -7,6 +7,7 @@ errors:
   todo: ignore
 linter:
   rules:
+    - unawaited_futures
     - always_declare_return_types
     - always_require_non_null_named_parameters
     - annotate_overrides

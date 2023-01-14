@@ -36,13 +36,13 @@ class AuthenticationRepository {
   Future<void> logIn({required String email, required String password}) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((value) => value.user);
-      locator<AnalyticsService>().logLoggedIn(loggedInMethod: 'email');
+      await locator<AnalyticsService>().logLoggedIn(loggedInMethod: 'email');
     } on FirebaseAuthException catch (e) {
-      Fluttertoast.showToast(msg: e.message ?? 'Error', toastLength: Toast.LENGTH_LONG, backgroundColor: Colors.red, timeInSecForIosWeb: 3);
+      await Fluttertoast.showToast(msg: e.message ?? 'Error', toastLength: Toast.LENGTH_LONG, backgroundColor: Colors.red, timeInSecForIosWeb: 3);
       if (kDebugMode) {
         log(e.toString());
       } else {
-        locator<AnalyticsService>().logError(exception: e.toString(), reason: 'log_in_email_password', stacktrace: StackTrace.current);
+        await locator<AnalyticsService>().logError(exception: e.toString(), reason: 'log_in_email_password', stacktrace: StackTrace.current);
       }
     }
   }
@@ -51,14 +51,14 @@ class AuthenticationRepository {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      Fluttertoast.showToast(msg: e.message ?? 'Error', toastLength: Toast.LENGTH_LONG, backgroundColor: Colors.red, timeInSecForIosWeb: 3);
+      await Fluttertoast.showToast(msg: e.message ?? 'Error', toastLength: Toast.LENGTH_LONG, backgroundColor: Colors.red, timeInSecForIosWeb: 3);
       if (kDebugMode) log(e.toString());
-      locator<AnalyticsService>().logError(exception: e.toString(), reason: 'register_email_pass', stacktrace: StackTrace.current);
+      await locator<AnalyticsService>().logError(exception: e.toString(), reason: 'register_email_pass', stacktrace: StackTrace.current);
     }
   }
 
   Future<void> logOut() async {
-    FirebaseAuth.instance.signOut();
+    await FirebaseAuth.instance.signOut();
     controller.add(AuthStream(user: null, status: AuthenticationStatus.unauthenticated));
   }
 
