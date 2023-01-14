@@ -32,9 +32,6 @@ class SessionUpdated extends SessionEvent {
 
   @override
   List<Object> get props => [session];
-
-  @override
-  String toString() => 'SessionUpdated { session: $session }';
 }
 
 class SessionDeleted extends SessionEvent {
@@ -44,9 +41,6 @@ class SessionDeleted extends SessionEvent {
 
   @override
   List<Object> get props => [session];
-
-  @override
-  String toString() => 'SessionDeleted { session: $session }';
 }
 
 class SessionLoaded extends SessionEvent {
@@ -56,9 +50,6 @@ class SessionLoaded extends SessionEvent {
 
   @override
   List<Object> get props => [sessions];
-
-  @override
-  String toString() => 'SessionLoaded { sessions: $sessions }';
 }
 
 class SessionJoined extends SessionEvent {
@@ -67,9 +58,6 @@ class SessionJoined extends SessionEvent {
 
   @override
   List<Object> get props => [id];
-
-  @override
-  String toString() => 'SessionJoined { session: $id }';
 }
 
 class SessionChanged extends SessionEvent {
@@ -79,7 +67,74 @@ class SessionChanged extends SessionEvent {
 
   @override
   List<Object> get props => [session];
+}
+
+class SessionAgileCardSelected extends SessionEvent {
+  final Selection selection;
+  const SessionAgileCardSelected(this.selection);
 
   @override
-  String toString() => 'SessionChanged { session: $session }';
+  List<Object> get props => [selection];
+}
+
+class SessionLeave extends SessionEvent {
+  const SessionLeave();
+
+  @override
+  List<Object> get props => [];
+}
+
+class SessionAgileCardDeselected extends SessionEvent {
+  const SessionAgileCardDeselected();
+
+  @override
+  List<Object> get props => [];
+}
+
+class SessionNameChanged extends SessionEvent {
+  final String name;
+  const SessionNameChanged(this.name);
+
+  @override
+  List<Object> get props => [name];
+}
+
+class SessionDescriptionChanged extends SessionEvent {
+  final String description;
+  const SessionDescriptionChanged(this.description);
+
+  @override
+  List<Object> get props => [description];
+}
+
+class SessionForceParticipantAdded extends SessionEvent {
+  final Participant participant;
+  const SessionForceParticipantAdded(this.participant);
+
+  @override
+  List<Object> get props => [participant];
+}
+
+class SessionRevealCards extends SessionEvent {
+  final bool reveal;
+  const SessionRevealCards({required this.reveal});
+
+  @override
+  List<Object> get props => [reveal];
+}
+
+class SessionForceParticipantRemoved extends SessionEvent {
+  final Participant participant;
+  const SessionForceParticipantRemoved(this.participant);
+
+  @override
+  List<Object> get props => [participant];
+}
+
+class SessionUseShirtSizes extends SessionEvent {
+  final bool useShirtSizes;
+  const SessionUseShirtSizes({required this.useShirtSizes});
+
+  @override
+  List<Object> get props => [useShirtSizes];
 }

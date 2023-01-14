@@ -1,8 +1,10 @@
 import 'package:agile_cards/app/services/analytics_service.dart';
 import 'package:agile_cards/app/services/refresh_stream.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
-import 'package:agile_cards/pages/dashboard_page.dart';
+import 'package:agile_cards/features/session/views/session_settings_view.dart';
+import 'package:agile_cards/pages/session_page.dart';
 import 'package:agile_cards/pages/login_page.dart';
+import 'package:agile_cards/pages/profile_page.dart';
 import 'package:agile_cards/pages/registration_page.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
@@ -35,8 +37,21 @@ class AppRouter {
         builder: (context, state) => const RegistrationPage(),
       ),
       GoRoute(
-        path: '/dashboard',
-        builder: (context, state) => const DashboardPage(),
+        path: '/session',
+        builder: (context, state) => const SessionPage(),
+        routes: [
+          GoRoute(
+            parentNavigatorKey: navigatorKey,
+            path: 'profile',
+            name: 'profile_page',
+            builder: (context, state) => const ProfilePage(),
+          ),
+          GoRoute(
+            path: 'settings',
+            name: 'session_settings_page',
+            builder: (context, state) => const SessionSettingsView(),
+          )
+        ],
       ),
     ],
     redirect: (context, state) {
@@ -44,7 +59,7 @@ class AppRouter {
       if (state.location != "/signup" && !isAuthenticated && state.location != "/login" && !isAuthenticated) {
         return "/login";
       } else if (state.location == "/login" && isAuthenticated || state.location == "/signup" && isAuthenticated) {
-        return "/dashboard";
+        return "/session";
       } else {
         return null;
       }

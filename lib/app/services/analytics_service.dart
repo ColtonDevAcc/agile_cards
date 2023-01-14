@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:agile_cards/main.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart';
@@ -12,18 +13,16 @@ class AnalyticsService extends NavigatorObserver {
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   final FirebaseCrashlytics crashlytics = FirebaseCrashlytics.instance;
   final FirebasePerformance performance = FirebasePerformance.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
   String currentRoute = "/";
-  AnalyticsService({
-    this.debug = false,
-  }) {
-    if (!kDebugMode) {
-      performance.setPerformanceCollectionEnabled(true);
-      crashlytics.setCrashlyticsCollectionEnabled(true);
-      analytics.setAnalyticsCollectionEnabled(true);
+  AnalyticsService({required this.debug}) {
+    if (debug) {
+      log("AnalyticsService initialized in debug mode");
     } else {
-      performance.setPerformanceCollectionEnabled(false);
-      crashlytics.setCrashlyticsCollectionEnabled(false);
-      analytics.setAnalyticsCollectionEnabled(false);
+      log("AnalyticsService initialized in prod mode");
+      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+      FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+      FirebasePerformance.instance.setPerformanceCollectionEnabled(true);
     }
   }
 
@@ -35,7 +34,10 @@ class AnalyticsService extends NavigatorObserver {
   }
 
   Future<void> logEvent({required String name, Map<String, dynamic>? parameters}) async {
-    if (debug) log("event logged: name: $name parameters: $parameters");
+    if (debug) {
+      log("event logged: name: $name parameters: $parameters");
+      return;
+    }
 
     await analytics.logEvent(name: name, parameters: parameters);
   }
@@ -43,6 +45,7 @@ class AnalyticsService extends NavigatorObserver {
   Future<void> logError({required String exception, StackTrace? stacktrace, required String reason, bool? fatal}) async {
     if (debug) {
       log("error logged: exception: $exception, stacktrace: $stacktrace, reason: $reason, fatal: $fatal");
+      return;
     }
 
     await crashlytics.recordError(
@@ -58,7 +61,7 @@ class AnalyticsService extends NavigatorObserver {
     RequestOptions? dioOptions;
     HttpMetric? metric;
 
-    if (!kDebugMode) {
+    if (!debug) {
       try {
         dio.interceptors.add(
           InterceptorsWrapper(
@@ -70,7 +73,7 @@ class AnalyticsService extends NavigatorObserver {
                   (element) => element.name.toLowerCase() == dioOptions!.method.toLowerCase(),
                 ),
               );
-              metric!.start();
+              await metric!.start();
               handler.next(options);
             },
             onResponse: (response, handler) async {
@@ -78,6 +81,7 @@ class AnalyticsService extends NavigatorObserver {
                 ..responsePayloadSize = response.data.length
                 ..responseContentType = response.headers.value('content-type')
                 ..responsePayloadSize = response.data.length
+                // ignore: unawaited_futures
                 ..stop();
               if (debug) log("network performance logged: ${dioOptions?.path} with time");
               handler.next(response);
@@ -87,6 +91,7 @@ class AnalyticsService extends NavigatorObserver {
                 ..responsePayloadSize = e.response?.data.length ?? 0
                 ..responseContentType = e.response?.headers.value('content-type')
                 ..responsePayloadSize = e.response?.data.length ?? 0
+                // ignore: unawaited_futures
                 ..stop();
               handler.next(e);
             },
@@ -95,17 +100,33 @@ class AnalyticsService extends NavigatorObserver {
       } catch (e) {
         final error = e;
         if (debug) log("error adding dio wrapper");
-        locator<AnalyticsService>().logError(exception: error.toString(), reason: 'error adding dio wrapper');
+        await locator<AnalyticsService>().logError(exception: error.toString(), reason: 'error adding dio wrapper');
       }
     }
 
     return dio;
   }
 
+  Future<void> logNetworkPerformance({required String url, required int time}) async {
+    if (debug) {
+      log("network performance logged: $url with time: $time");
+      return;
+    }
+    await analytics.logEvent(name: 'network_performance', parameters: {'url': url, 'time': time});
+  }
+
+  Future<void> logLoggedIn({String? loggedInMethod}) async {
+    if (debug) {
+      log("logged in");
+      return;
+    }
+
+    await analytics.setUserId(id: auth.currentUser!.uid);
+    await analytics.logLogin(loginMethod: loggedInMethod);
+  }
+
   void get analyticsInstance => analytics;
-
   void get crashlyticsInstance => crashlytics;
-
   void get performanceInstance => performance;
 
   @override

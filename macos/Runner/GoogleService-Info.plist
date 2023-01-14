@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>964978059660-cibv0anqgiqs253u1meap4p565552gb3.apps.googleusercontent.com</string>
+	<string>964978059660-6fo53jtaq0qqfidbejk6bt607qqd8ue2.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.964978059660-cibv0anqgiqs253u1meap4p565552gb3</string>
+	<string>com.googleusercontent.apps.964978059660-6fo53jtaq0qqfidbejk6bt607qqd8ue2</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAd8lSsk2LcHAHKP4ytI6S3yRra4epcyk8</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.agileCards</string>
+	<string>com.voostack.agilecardssprintplanning</string>
 	<key>PROJECT_ID</key>
 	<string>agilecards-da16f</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:964978059660:ios:601a208278ff3817438ea9</string>
+	<string>1:964978059660:ios:8eb546ad69ab9710438ea9</string>
+	<key>DATABASE_URL</key>
+	<string>https://agilecards-da16f-default-rtdb.firebaseio.com</string>
 </dict>
 </plist>

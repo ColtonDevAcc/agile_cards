@@ -66,14 +66,14 @@ class SearchSessionBottomSheet extends StatelessWidget {
                     if (state.sessionSearch != null && state.sessionSearch != Session.empty())
                       GestureDetector(
                         onTap: () {
-                          context.read<SessionBloc>().add(SessionJoined(state.sessionSearch!.id));
+                          context.read<SessionBloc>().add(SessionJoined(state.sessionSearch!.id!));
                           Navigator.of(context).pop();
                         },
                         child: ListTile(
-                          title: Text(participant.email),
+                          title: Text(participant.email!),
                           subtitle: Wrap(
                             spacing: 8,
-                            children: participants.map((p) => Chip(label: Text(p.email.split('@')[0]))).toList(),
+                            children: participants.map((p) => Chip(label: Text(p.email!.split('@')[0]))).toList(),
                           ),
                           trailing: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
                         ),

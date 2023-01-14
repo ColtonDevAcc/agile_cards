@@ -1,8 +1,10 @@
 import 'package:agile_cards/features/login/cubit/login_cubit.dart';
 import 'package:agile_cards/features/login/widgets/atom/primary_button.dart';
+import 'package:agile_cards/pages/primary_textfield.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -13,47 +15,40 @@ class LoginPage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.background,
       body: BlocBuilder<LoginCubit, LoginState>(
         builder: (context, state) {
-          return CustomScrollView(
+          return SingleChildScrollView(
             physics: const NeverScrollableScrollPhysics(),
-            slivers: [
-              SliverAppBar(
-                title: const Text('Agile Cards'),
-                expandedHeight: MediaQuery.of(context).size.height * 0.5,
-                flexibleSpace: Stack(
-                  children: [
-                    Positioned(
-                      bottom: -1,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.background,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(50)),
-                        ),
-                      ),
-                    ),
-                  ],
+            child: Column(
+              children: [
+                Container(
+                  alignment: Alignment.topCenter,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  height: MediaQuery.of(context).size.height * 0.5,
+                  child: SafeArea(
+                    child: SvgPicture.asset('assets/AgileCardsSprintPlanning.svg'),
+                  ),
                 ),
-              ),
-              SliverFillRemaining(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    if (!state.isLogin && !state.isRegister)
-                      Positioned(
-                        top: 70,
-                        child: PrimaryButton(
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  height: MediaQuery.of(context).size.height * 0.5,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 5),
+                      if (!state.isLogin && !state.isRegister)
+                        PrimaryButton(
                           title: 'Get Started',
                           onPressed: () {
                             context.read<LoginCubit>().register();
                           },
                         ),
-                      ),
-                    if (state.isLogin || state.isRegister)
-                      Positioned(
-                        top: 5,
-                        child: AnimatedOpacity(
+                      if (state.isLogin || state.isRegister)
+                        AnimatedOpacity(
                           opacity: state.isLogin || state.isRegister ? 1 : 0,
                           duration: const Duration(milliseconds: 400),
                           child: AutofillGroup(
@@ -61,14 +56,14 @@ class LoginPage extends StatelessWidget {
                               children: [
                                 PrimaryTextField(
                                   title: 'Email',
-                                  onPressed: (v) => context.read<LoginCubit>().emailChanged(v),
+                                  onChanged: (v) => context.read<LoginCubit>().emailChanged(v),
                                   keyboardType: TextInputType.emailAddress,
                                   autofillHints: const [AutofillHints.email],
                                 ),
                                 const SizedBox(height: 10),
                                 PrimaryTextField(
                                   title: 'Password',
-                                  onPressed: (v) => context.read<LoginCubit>().passwordChanged(v),
+                                  onChanged: (v) => context.read<LoginCubit>().passwordChanged(v),
                                   obscureText: true,
                                   autofillHints: const [AutofillHints.password],
                                   keyboardType: TextInputType.visiblePassword,
@@ -77,11 +72,7 @@ class LoginPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ),
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 300),
-                      top: state.isLogin || state.isRegister ? MediaQuery.of(context).size.height * 0.155 : MediaQuery.of(context).size.height * 0.15,
-                      child: PrimaryButton(
+                      PrimaryButton(
                         title: !state.isLogin && !state.isRegister
                             ? 'Login'
                             : state.isLogin
@@ -98,10 +89,22 @@ class LoginPage extends StatelessWidget {
                         },
                         outlined: true,
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: SafeArea(
+                      if (state.isLogin || state.isRegister)
+                        GestureDetector(
+                          onTap: () {
+                            context.read<LoginCubit>().reset();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'back',
+                              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                            ),
+                          ),
+                        ),
+                      const Spacer(),
+                      Align(
+                        alignment: Alignment.bottomCenter,
                         child: AutoSizeText.rich(
                           TextSpan(
                             text: 'By continuing, you agree to our\n',
@@ -119,59 +122,17 @@ class LoginPage extends StatelessWidget {
                             ],
                           ),
                           textAlign: TextAlign.center,
-                          maxLines: 2,
-                          maxFontSize: 16,
+                          maxFontSize: 18,
+                          minFontSize: 11,
                         ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ],
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           );
         },
-      ),
-    );
-  }
-}
-
-class PrimaryTextField extends StatelessWidget {
-  final String? hintText;
-  final String? labelText;
-  final String? title;
-  final TextInputType? keyboardType;
-  final Function(String)? onPressed;
-  final Iterable<String>? autofillHints;
-  final bool? obscureText;
-  const PrimaryTextField({
-    super.key,
-    required this.onPressed,
-    this.hintText,
-    this.labelText,
-    this.title,
-    this.autofillHints,
-    this.keyboardType,
-    this.obscureText,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.9,
-      child: TextFormField(
-        onChanged: onPressed,
-        keyboardType: keyboardType,
-        autofillHints: autofillHints,
-        obscureText: obscureText ?? false,
-        decoration: InputDecoration(
-          labelText: title,
-          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onBackground),
-          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onBackground),
-          border: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
       ),
     );
   }

@@ -1,6 +1,3 @@
-// ignore: depend_on_referenced_packages
-import 'dart:developer';
-
 import 'package:agile_cards/app/repositories/authentication_repository.dart';
 // ignore: depend_on_referenced_packages
 import 'package:bloc/bloc.dart';

@@ -1,21 +1,30 @@
+import 'dart:developer';
+
 import 'package:agile_cards/app/models/participant_model.dart';
+import 'package:agile_cards/app/models/selection_model.dart';
+import 'package:agile_cards/app/repositories/session_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'session_model.g.dart';
 
 @JsonSerializable(anyMap: true, createFieldMap: true, explicitToJson: true)
 class Session extends Equatable {
-  final String id;
+  final String? id;
   final String? name;
   final List<Participant>? participants;
+  final bool? cardsRevealed;
   final String? description;
   final String? owner;
   final String? imageUrl;
   final bool? isShirtSizes;
+  final List<Map<String, Selection>>? selections;
 
   const Session({
-    required this.id,
+    this.id,
+    this.cardsRevealed,
+    this.selections,
     this.name,
     this.description,
     this.participants,
@@ -25,7 +34,7 @@ class Session extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, name, description, imageUrl, owner, participants, isShirtSizes];
+  List<Object?> get props => [id, name, description, imageUrl, owner, participants, isShirtSizes, selections, cardsRevealed];
 
   Session copyWith({
     String? id,
@@ -33,8 +42,10 @@ class Session extends Equatable {
     String? description,
     String? imageUrl,
     String? owner,
-    List<Participant>? participants,
     bool? isShirtSizes,
+    List<Participant>? participants,
+    List<Map<String, Selection>>? selections,
+    bool? cardsRevealed,
   }) {
     return Session(
       id: id ?? this.id,
@@ -44,7 +55,30 @@ class Session extends Equatable {
       owner: owner ?? this.owner,
       participants: participants ?? this.participants,
       isShirtSizes: isShirtSizes ?? this.isShirtSizes,
+      selections: selections ?? this.selections,
+      cardsRevealed: cardsRevealed ?? this.cardsRevealed,
     );
+  }
+
+  String get sessionMeasurementAverage {
+    if (isShirtSizes ?? true) {
+      return tShirtSizes.length < sessionAverageValue ? tShirtSizes.last : tShirtSizes[sessionAverageValue];
+    } else {
+      return taskSizes.length < sessionAverageValue ? taskSizes.last : taskSizes[sessionAverageValue];
+    }
+  }
+
+  int get selectionsNotLockedIn {
+    if (selections == null || selections!.isEmpty) return 0;
+    //return the number of selections.value that are not locked in
+    return selections!.where((selection) => selection.values.single.lockedIn != true).length;
+  }
+
+  int get sessionAverageValue {
+    final List<Map<String, Selection>> selections = this.selections ?? [];
+    final List<int> values = selections.map((selection) => selection.values.single.cardSelected ?? 0).toList();
+    final int sum = values.reduce((value, element) => value);
+    return (sum / values.length).round();
   }
 
   factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);
@@ -59,6 +93,44 @@ class Session extends Equatable {
       imageUrl: '',
       owner: '',
       isShirtSizes: false,
+      selections: [],
+      participants: [],
+      cardsRevealed: false,
+    );
+  }
+
+  factory Session.fromDocument(DataSnapshot snapshot) {
+    // ignore: cast_nullable_to_non_nullable
+    final Map<String, dynamic> document = Map<String, dynamic>.from(snapshot.value as Map);
+    final selections = List<Map<String, Selection>>.from(
+      (document['selections'] ?? {}).entries.map(
+        (entry) {
+          final Map<String, Selection> selection = {
+            entry.key: Selection.fromJson(Map<String, dynamic>.from(entry.value as Map)),
+          };
+          return selection;
+        },
+      ).toList(),
+    );
+
+    final participants = List<Participant>.from(
+      (document['participants'] as List).map(
+        (participant) {
+          return Participant.fromJson(Map<String, dynamic>.from(participant as Map));
+        },
+      ),
+    );
+
+    return Session(
+      id: document['id'],
+      name: document['name'],
+      description: document['description'],
+      imageUrl: document['imageUrl'],
+      owner: document['owner'],
+      isShirtSizes: document['isShirtSizes'],
+      selections: selections,
+      participants: participants,
+      cardsRevealed: document['cardsRevealed'],
     );
   }
 }
