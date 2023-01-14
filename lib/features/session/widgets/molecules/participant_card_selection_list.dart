@@ -3,6 +3,8 @@ import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
 import 'package:agile_cards/features/session/cubits/agile_card/agile_card_cubit.dart';
 import 'package:agile_cards/features/session/widgets/atoms/agile_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,13 +33,13 @@ class ParticipantCardSelectionList extends StatelessWidget {
                     BlocBuilder<AgileCardCubit, AgileCardState>(
                       builder: (context, cardState) {
                         return AgileCard(
-                          cardKey: cardKey,
+                          flipCardKey: cardKey,
                           measurement: state.session.sessionMeasurementAverage,
                           participant: state.session.participants?.singleWhere(
                             (element) => element.id == selection.values.single.userId,
                             orElse: () => Participant.empty(),
                           ),
-                          controller: cardState.controller,
+                          isOwnersCard: selection.values.single.userId == FirebaseAuth.instance.currentUser?.uid,
                         );
                       },
                     ),
