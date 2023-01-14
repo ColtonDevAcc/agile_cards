@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
@@ -19,7 +17,7 @@ class Session extends Equatable {
   final String? owner;
   final String? imageUrl;
   final bool? isShirtSizes;
-  final List<Map<String, Selection>>? selections;
+  final List<Selection>? selections;
 
   const Session({
     this.id,
@@ -44,7 +42,7 @@ class Session extends Equatable {
     String? owner,
     bool? isShirtSizes,
     List<Participant>? participants,
-    List<Map<String, Selection>>? selections,
+    List<Selection>? selections,
     bool? cardsRevealed,
   }) {
     return Session(
@@ -70,13 +68,11 @@ class Session extends Equatable {
 
   int get selectionsNotLockedIn {
     if (selections == null || selections!.isEmpty) return 0;
-    //return the number of selections.value that are not locked in
-    return selections!.where((selection) => selection.values.single.lockedIn != true).length;
+    return selections!.where((selection) => selection.lockedIn != true).length;
   }
 
   int get sessionAverageValue {
-    final List<Map<String, Selection>> selections = this.selections ?? [];
-    final List<int> values = selections.map((selection) => selection.values.single.cardSelected ?? 0).toList();
+    final List<int> values = (selections ?? []).map((selection) => selection.cardSelected ?? 0).toList();
     final int sum = values.reduce((value, element) => value);
     return (sum / values.length).round();
   }
@@ -113,12 +109,15 @@ class Session extends Equatable {
       ).toList(),
     );
 
-    final participants = List<Participant>.from(
-      (document['participants'] as List).map(
-        (participant) {
-          return Participant.fromJson(Map<String, dynamic>.from(participant as Map));
+    final participants = List<Map<String, Participant>>.from(
+      (document['participants'] ?? {}).entries.map(
+        (entry) {
+          final Map<String, Participant> selection = {
+            entry.key: Participant.fromJson(Map<String, dynamic>.from(entry.value as Map)),
+          };
+          return selection;
         },
-      ),
+      ).toList(),
     );
 
     return Session(
@@ -128,9 +127,22 @@ class Session extends Equatable {
       imageUrl: document['imageUrl'],
       owner: document['owner'],
       isShirtSizes: document['isShirtSizes'],
-      selections: selections,
-      participants: participants,
+      selections: selections.map((selection) => selection.values.single).toList(),
+      participants: participants.map((participant) => participant.values.single).toList(),
       cardsRevealed: document['cardsRevealed'],
     );
+  }
+
+  Map<String, dynamic> toDocument() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'imageUrl': imageUrl,
+      'owner': owner,
+      'isShirtSizes': isShirtSizes,
+      'selections': selections?.map((selection) => {selections?.single.userId: selection.toJson()}).toList(),
+      'cardsRevealed': cardsRevealed,
+    };
   }
 }

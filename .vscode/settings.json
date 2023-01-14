@@ -3,6 +3,7 @@
     "agilecardssprintplanning",
     "Fluttertoast",
     "reorderables",
-    "voostack"
+    "voostack",
+    "vsync"
   ]
 }

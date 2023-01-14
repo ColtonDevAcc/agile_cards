@@ -1,6 +1,6 @@
-import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
 import 'package:agile_cards/features/login/widgets/atom/primary_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,7 +15,7 @@ class FlipCardButton extends StatelessWidget {
       builder: (context, state) {
         final bool cardsRevealed = state.session.cardsRevealed ?? false;
         final bool? ownerCardLockedIn = state.session.selections?.any((element) {
-          return element.keys.single == context.read<AppBloc>().state.user!.id && element.values.single.lockedIn == true;
+          return element.userId == FirebaseAuth.instance.currentUser?.uid && element.lockedIn == true;
         });
 
         return ownerCardLockedIn == null || ownerCardLockedIn

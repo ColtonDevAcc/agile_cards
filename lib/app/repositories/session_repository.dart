@@ -36,7 +36,6 @@ class SessionRepository {
       } else {
         ref.onValue.listen((event) {
           if (event.snapshot.value != null) {
-            log('something changed');
             controller.add(SessionStream(stream: Session.fromDocument(event.snapshot)));
           }
         });
@@ -77,15 +76,10 @@ class SessionRepository {
     try {
       final String? uid = FirebaseAuth.instance.currentUser?.uid;
       final updatedSession = session.copyWith(id: uid, owner: uid);
-      await ref
-          .set(updatedSession.toJson())
-          .onError((error, stackTrace) => log('error creating session: $error'))
-          .whenComplete(() => log('session created'));
-
+      await ref.set(updatedSession.toDocument()).onError((error, stackTrace) => log('error creating session: $error'));
+      await ref.child('participants').child(uid!).set(Participant.fromUser(FirebaseAuth.instance.currentUser!).toJson());
       subscribeToSession(ref);
-      await locator<AnalyticsService>().logEvent(
-        name: 'create_session',
-      );
+      await locator<AnalyticsService>().logEvent(name: 'create_session');
     } catch (e) {
       await locator<AnalyticsService>().logError(exception: e.toString(), reason: 'create_session', stacktrace: StackTrace.current);
     }
@@ -105,7 +99,8 @@ class SessionRepository {
     try {
       final sessionRef = FirebaseDatabase.instance.ref('sessions/$sessionId');
       final User user = FirebaseAuth.instance.currentUser!;
-      final Session session = Session.fromDocument(await sessionRef.get());
+      final DataSnapshot snapshot = await sessionRef.get();
+      final Session session = Session.fromDocument(snapshot);
 
       if (user.uid == session.owner) {
         log('returning you to the session as the owner');
@@ -126,25 +121,18 @@ class SessionRepository {
         }
       }
 
-      final updatedSession = session.copyWith(
-        participants: [
-          ...session.participants ?? [],
-          Participant.fromUser(user),
-        ],
-      );
-
-      await sessionRef.update(updatedSession.toJson());
+      await sessionRef.child('participants').child(user.uid).set(Participant.fromUser(user).toJson());
 
       subscribeToSession(sessionRef);
       await locator<AnalyticsService>().logEvent(
         name: 'joined_session',
       );
-    } catch (e) {
-      await locator<AnalyticsService>().logError(exception: e.toString(), reason: 'join_session', stacktrace: StackTrace.current);
+    } catch (e, st) {
+      await locator<AnalyticsService>().logError(exception: e.toString(), reason: 'join_session', stacktrace: st);
     }
   }
 
-  Future<void> agileCardSelected(Selection selection) async {
+  Future<void> updateCardSelection(Selection selection) async {
     try {
       final Session? session = await ref.get().then((value) => Session.fromDocument(value));
       final User user = FirebaseAuth.instance.currentUser!;
@@ -167,33 +155,13 @@ class SessionRepository {
     }
   }
 
-  Future<void> agileCardDeselected() async {
-    try {
-      final Object? data = await ref.get().then((value) => value.child('selections').value);
-      final User user = FirebaseAuth.instance.currentUser!;
-
-      if (data != null) {
-        final Map<String, dynamic> selections = Map<String, dynamic>.from(data as Map);
-        if (selections.containsKey(user.uid)) {
-          await ref.child('selections').child(user.uid).child('lockedIn').set(false);
-        }
-      }
-
-      await locator<AnalyticsService>().logEvent(name: 'deselect_agile_card');
-    } catch (e) {
-      await locator<AnalyticsService>().logError(exception: e.toString(), reason: 'agile_card_deselected', stacktrace: StackTrace.current);
-    }
-  }
-
   Future<void> leaveSession() async {
     try {
       final session = await ref.get();
       final User user = FirebaseAuth.instance.currentUser!;
 
       if (session.value != null) {
-        // ignore: cast_nullable_to_non_nullable
-        final data = Map<String, dynamic>.from(session.value as Map);
-        final Session sessionResult = Session.fromJson(data);
+        final Session sessionResult = Session.fromDocument(session);
 
         if (sessionResult.owner == user.uid) {
           await ref.remove();
@@ -201,22 +169,16 @@ class SessionRepository {
         }
 
         //remove participant
-        sessionResult.participants?.removeWhere((element) => element.id == user.uid);
+        await ref.child('participants').child(user.uid).remove();
 
         //remove selection
         if (sessionResult.selections != null) {
-          sessionResult.selections?.removeWhere((element) => element.values.single.userId == user.uid);
+          await ref.child('selections').child(user.uid).remove();
         }
-
-        await ref.update(sessionResult.toJson()).whenComplete(
-              () => ref = FirebaseDatabase.instance.ref("sessions/${FirebaseAuth.instance.currentUser!.uid}"),
-            );
       }
-      await locator<AnalyticsService>().logEvent(
-        name: 'leave_session',
-      );
-    } catch (e) {
-      await locator<AnalyticsService>().logError(exception: e.toString(), reason: 'leave_session', stacktrace: StackTrace.current);
+      await locator<AnalyticsService>().logEvent(name: 'leave_session');
+    } catch (e, st) {
+      await locator<AnalyticsService>().logError(exception: e.toString(), reason: 'leave_session', stacktrace: st);
     }
   }
 
