@@ -2,6 +2,7 @@ import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -59,10 +60,10 @@ class Session extends Equatable {
   }
 
   String get sessionMeasurementAverage {
-    if (isShirtSizes ?? true) {
-      return tShirtSizes.length < sessionAverageValue ? tShirtSizes.last : tShirtSizes[sessionAverageValue];
-    } else {
+    if (isShirtSizes == false) {
       return taskSizes.length < sessionAverageValue ? taskSizes.last : taskSizes[sessionAverageValue];
+    } else {
+      return tShirtSizes.length < sessionAverageValue ? tShirtSizes.last : tShirtSizes[sessionAverageValue];
     }
   }
 
@@ -73,8 +74,9 @@ class Session extends Equatable {
 
   int get sessionAverageValue {
     final List<int> values = (selections ?? []).map((selection) => selection.cardSelected ?? 0).toList();
-    final int sum = values.reduce((value, element) => value);
-    return (sum / values.length).round();
+    final int avg = (values.reduce((value, element) => value + element) / values.length).round();
+    return avg;
+
   }
 
   factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);
@@ -96,6 +98,11 @@ class Session extends Equatable {
   }
 
   factory Session.fromDocument(DataSnapshot snapshot) {
+    if (snapshot.value == null) {
+      log('Session.fromDocument: snapshot.value is null');
+      return Session.empty();
+    }
+
     // ignore: cast_nullable_to_non_nullable
     final Map<String, dynamic> document = Map<String, dynamic>.from(snapshot.value as Map);
     final selections = List<Map<String, Selection>>.from(
