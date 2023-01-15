@@ -48,7 +48,7 @@ dependencies:
   copy_with_extension_gen: ^5.0.0
 
   #ui
-  flip_card: ^0.6.0
+  animate_do: ^3.0.2
   stacked_card_carousel: ^0.0.4
   font_awesome_flutter: ^10.3.0
 

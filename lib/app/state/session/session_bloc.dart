@@ -28,8 +28,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<SessionJoined>(_onSessionJoined);
     on<SessionChanged>(_onSessionChanged);
     on<SessionSearched>(_onSessionSearched);
-    on<SessionAgileCardSelected>(_onSessionAgileCardSelected);
-    on<SessionAgileCardDeselected>(_onSessionAgileCardDeselected);
+    on<SessionUpdateAgileCard>(_onSessionUpdateAgileCard);
     on<SessionLeave>(_onSessionLeave);
     on<SessionNameChanged>(_onSessionNameChanged);
     on<SessionDescriptionChanged>(_onSessionDescriptionChanged);
@@ -79,12 +78,8 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     emit(state.copyWith(sessionSearch: sessions ?? Session.empty()));
   }
 
-  Future<void> _onSessionAgileCardSelected(SessionAgileCardSelected event, Emitter<SessionState> emit) async {
-    await sessionRepository.agileCardSelected(event.selection);
-  }
-
-  Future<void> _onSessionAgileCardDeselected(SessionAgileCardDeselected event, Emitter<SessionState> emit) async {
-    await sessionRepository.agileCardDeselected();
+  Future<void> _onSessionUpdateAgileCard(SessionUpdateAgileCard event, Emitter<SessionState> emit) async {
+    await sessionRepository.updateCardSelection(event.selection);
   }
 
   Future<void> _onSessionLeave(SessionLeave event, Emitter<SessionState> emit) async {
