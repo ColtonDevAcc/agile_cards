@@ -68,7 +68,7 @@ class SessionSettingsView extends StatelessWidget {
                     onTap: () {
                       final bool isShirtSizes = state.session.isShirtSizes ?? true;
                       // ignore: avoid_bool_literals_in_conditional_expressions
-                      context.read<SessionBloc>().add(SessionToggleUseShirtSizes(useShirtSizes: isShirtSizes ? false : true));
+                      context.read<SessionBloc>().add(SessionUseShirtSizes(useShirtSizes: isShirtSizes ? false : true));
                     },
                   ),
                 if (isOwner)
@@ -99,7 +99,7 @@ class SessionSettingsView extends StatelessWidget {
                     title: isOwner ? const Text('Delete Session') : const Text('Leave Session'),
                     trailing: isOwner ? const Icon(Icons.delete) : const Icon(Icons.exit_to_app),
                     onTap: () {
-                      isOwner ? context.read<SessionBloc>().add(const SessionDeleted()) : context.read<SessionBloc>().add(const SessionLeave());
+                      context.read<SessionBloc>().add(const SessionLeave());
                       context.pop();
                     },
                   ),

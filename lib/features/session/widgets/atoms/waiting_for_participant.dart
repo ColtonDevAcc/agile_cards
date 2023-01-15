@@ -11,14 +11,13 @@ class WaitingForParticipant extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SessionBloc, SessionState>(
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 10),
-          child: Text(
-            state.session.cardsRevealed != true
-                ? 'Waiting for ${state.session.selectionsNotLockedIn} participants'
-                : 'average score is ${state.session.sessionMeasurementAverage}',
-          ),
-        );
+        final int lockedInCount = state.session.selectionsNotLockedIn;
+        return lockedInCount != 0
+            ? Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                child: Text('Waiting for $lockedInCount participants'),
+              )
+            : const SizedBox();
       },
     );
   }

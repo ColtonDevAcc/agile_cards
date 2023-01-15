@@ -21,7 +21,7 @@ class SessionFloatingActionButton extends StatelessWidget {
         return isEmpty || isOwner
             ? FloatingActionButton(
                 onPressed: !isOwner
-                    ? () => context.read<SessionBloc>().add(const SessionCreated())
+                    ? () => context.read<SessionBloc>().add(SessionCreated(context.read<AppBloc>().state.user!))
                     : () {
                         DynamicLinkService().buildDynamicLink(
                           socialMediaTitle: 'Join my session',

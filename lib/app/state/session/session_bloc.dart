@@ -34,22 +34,19 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<SessionDescriptionChanged>(_onSessionDescriptionChanged);
     on<SessionForceParticipantAdded>(_onSessionParticipantAdded);
     on<SessionForceParticipantRemoved>(_onSessionForceParticipantRemoved);
-    on<SessionToggleRevealCards>(_onSessionToggleCards);
-    on<SessionToggleUseShirtSizes>(_onSessionToggleUseShirtSizes);
-    sessionSubscription = sessionRepository.status.listen((session) {
-      add(SessionChanged(session));
-    });
+    on<SessionRevealCards>(_onSessionRevealCards);
+    on<SessionUseShirtSizes>(_onSessionUseShirtSizes);
+    sessionSubscription = sessionRepository.status.listen((status) => add(SessionChanged(status)));
   }
 
   Future<void> _onSessionCreated(SessionCreated event, Emitter<SessionState> emit) async {
     try {
       final Session session = Session(
-        id: FirebaseAuth.instance.currentUser!.uid,
+        id: event.owner.id ?? '',
         name: 'unnamed',
         description: 'no description',
-        owner: FirebaseAuth.instance.currentUser?.uid,
-        isShirtSizes: false,
-        participants: [Participant.fromUser(FirebaseAuth.instance.currentUser!)],
+        owner: FirebaseAuth.instance.currentUser?.email,
+        participants: [event.owner],
       );
 
       await sessionRepository.createSession(session);
@@ -64,31 +61,29 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     await sessionRepository.updateSession(event.session);
   }
 
-  Future<void> _onSessionDeleted(SessionDeleted event, Emitter<SessionState> emit) async {
-    await sessionRepository.deleteSession();
-  }
+  Future<void> _onSessionDeleted(SessionDeleted event, Emitter<SessionState> emit) async {}
 
   Future<void> _onSessionLoaded(SessionLoaded event, Emitter<SessionState> emit) async {}
 
   Future<void> _onSessionJoined(SessionJoined event, Emitter<SessionState> emit) async {
-    await sessionRepository.joinSession(sessionId: event.id);
+    await sessionRepository.joinSession(event.id);
   }
 
   Future<void> _onSessionChanged(SessionChanged event, Emitter<SessionState> emit) async {
-    emit(state.copyWith(session: event.session));
+    emit(state.copyWith(session: event.session.stream ?? Session.empty()));
   }
 
   Future<void> _onSessionSearched(SessionSearched event, Emitter<SessionState> emit) async {
     final sessions = await sessionRepository.searchForSession(event.query);
-    emit(state.copyWith(sessionSearch: sessions));
+    emit(state.copyWith(sessionSearch: sessions ?? Session.empty()));
   }
 
   Future<void> _onSessionUpdateAgileCard(SessionUpdateAgileCard event, Emitter<SessionState> emit) async {
-    await sessionRepository.updateAgileCard(selection: event.selection);
+    await sessionRepository.updateCardSelection(event.selection);
   }
 
   Future<void> _onSessionLeave(SessionLeave event, Emitter<SessionState> emit) async {
-    await sessionRepository.leaveSession(userId: FirebaseAuth.instance.currentUser!.uid);
+    await sessionRepository.leaveSession();
     emit(state.copyWith(session: Session.empty()));
   }
 
@@ -101,19 +96,19 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   }
 
   Future<void> _onSessionParticipantAdded(SessionForceParticipantAdded event, Emitter<SessionState> emit) async {
-    await sessionRepository.addParticipant(participant: event.participant);
+    await sessionRepository.forceAddParticipant(participant: event.participant);
   }
 
   Future<void> _onSessionForceParticipantRemoved(SessionForceParticipantRemoved event, Emitter<SessionState> emit) async {
-    await sessionRepository.removeParticipant(participant: event.participant);
+    await sessionRepository.forceRemoveParticipant(participant: event.participant);
   }
 
-  Future<void> _onSessionToggleCards(SessionToggleRevealCards event, Emitter<SessionState> emit) async {
-    await sessionRepository.toggleRevealCards();
+  Future<void> _onSessionRevealCards(SessionRevealCards event, Emitter<SessionState> emit) async {
+    await sessionRepository.changeCardReveal(reveal: event.reveal);
   }
 
-  Future<void> _onSessionToggleUseShirtSizes(SessionToggleUseShirtSizes event, Emitter<SessionState> emit) async {
-    await sessionRepository.toggleSessionMeasurement();
+  Future<void> _onSessionUseShirtSizes(SessionUseShirtSizes event, Emitter<SessionState> emit) async {
+    await sessionRepository.useShirtSizes(useShirtSizes: event.useShirtSizes);
   }
 
   @override
