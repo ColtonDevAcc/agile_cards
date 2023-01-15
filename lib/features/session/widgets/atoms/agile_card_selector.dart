@@ -26,6 +26,7 @@ class AgileCardSelector extends StatelessWidget {
           child: Column(
             children: [
               if (userSelection.lockedIn == false && isParticipant)
+
                 Expanded(
                   child: StackedCardCarousel(
                     spaceBetweenItems: 200,
