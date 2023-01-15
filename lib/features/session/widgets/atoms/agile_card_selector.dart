@@ -3,7 +3,6 @@ import 'package:agile_cards/app/repositories/session_repository.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
 import 'package:agile_cards/features/session/widgets/atoms/flip_card_front.dart';
-import 'package:agile_cards/features/session/widgets/molecules/participant_card_selection_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,8 +20,7 @@ class AgileCardSelector extends StatelessWidget {
         final bool isParticipant = state.session.participants!.any((element) => element.id == FirebaseAuth.instance.currentUser?.uid);
 
         final bool isShirtSizes = context.read<SessionBloc>().state.session.isShirtSizes ?? true;
-        return SizedBox(
-          width: double.infinity,
+        return Expanded(
           child: Column(
             children: [
               if (userSelection.lockedIn == false && isParticipant)

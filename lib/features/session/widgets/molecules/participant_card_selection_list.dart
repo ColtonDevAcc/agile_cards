@@ -14,12 +14,10 @@ class ParticipantCardSelectionList extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SessionBloc, SessionState>(
       builder: (context, state) {
-        final ownerSelection = state.session.selections
-            ?.firstWhere((element) => element.userId == FirebaseAuth.instance.currentUser?.uid, orElse: () => Selection.empty());
-        final ownerLockedIn = ownerSelection?.lockedIn == true;
-        final bool isParticipant = state.session.participants?.any((element) => element.id == FirebaseAuth.instance.currentUser?.uid) ?? false;
+        final bool isParticipantLockedIn =
+            state.session.selections?.any((element) => element.userId == FirebaseAuth.instance.currentUser!.uid && element.lockedIn == true) ?? true;
 
-        return ownerSelection == Selection.empty() || ownerLockedIn || !isParticipant
+        return isParticipantLockedIn
             ? Expanded(
                 flex: 10,
                 child: SizedBox(
