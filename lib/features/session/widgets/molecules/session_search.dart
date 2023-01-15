@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:agile_cards/app/models/participant_model.dart';
 import 'package:agile_cards/app/models/session_model.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
@@ -66,11 +68,12 @@ class SearchSessionBottomSheet extends StatelessWidget {
                     if (state.sessionSearch != null && state.sessionSearch != Session.empty())
                       GestureDetector(
                         onTap: () {
+                          log('session joined: ${state.sessionSearch!.id}', name: 'SearchSessionBottomSheet');
                           context.read<SessionBloc>().add(SessionJoined(state.sessionSearch!.id!));
                           Navigator.of(context).pop();
                         },
                         child: ListTile(
-                          title: Text(participant.email!),
+                          title: Text(state.sessionSearch!.name!),
                           subtitle: Wrap(
                             spacing: 8,
                             children: participants.map((p) => Chip(label: Text(p.email!.split('@')[0]))).toList(),

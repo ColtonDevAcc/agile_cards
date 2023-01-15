@@ -23,7 +23,7 @@ class FlipCardButton extends StatelessWidget {
                 title: cardsRevealed == false ? 'Reveal' : 'Hide',
                 onPressed: () {
                   // ignore: avoid_bool_literals_in_conditional_expressions
-                  context.read<SessionBloc>().add(SessionRevealCards(reveal: cardsRevealed == false ? true : false));
+                  context.read<SessionBloc>().add(SessionToggleRevealCards(reveal: cardsRevealed == false ? true : false));
                 },
               )
             : const SizedBox();
