@@ -10,10 +10,11 @@ abstract class SessionEvent extends Equatable {
 class SessionStarted extends SessionEvent {}
 
 class SessionCreated extends SessionEvent {
-  const SessionCreated();
+  final Participant owner;
+  const SessionCreated(this.owner);
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [owner];
 }
 
 class SessionSearched extends SessionEvent {
@@ -34,10 +35,12 @@ class SessionUpdated extends SessionEvent {
 }
 
 class SessionDeleted extends SessionEvent {
-  const SessionDeleted();
+  final Session session;
+
+  const SessionDeleted(this.session);
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [session];
 }
 
 class SessionLoaded extends SessionEvent {
@@ -58,7 +61,7 @@ class SessionJoined extends SessionEvent {
 }
 
 class SessionChanged extends SessionEvent {
-  final Session session;
+  final SessionStream session;
 
   const SessionChanged(this.session);
 
@@ -105,9 +108,9 @@ class SessionForceParticipantAdded extends SessionEvent {
   List<Object> get props => [participant];
 }
 
-class SessionToggleRevealCards extends SessionEvent {
+class SessionRevealCards extends SessionEvent {
   final bool reveal;
-  const SessionToggleRevealCards({required this.reveal});
+  const SessionRevealCards({required this.reveal});
 
   @override
   List<Object> get props => [reveal];
@@ -121,9 +124,9 @@ class SessionForceParticipantRemoved extends SessionEvent {
   List<Object> get props => [participant];
 }
 
-class SessionToggleUseShirtSizes extends SessionEvent {
+class SessionUseShirtSizes extends SessionEvent {
   final bool useShirtSizes;
-  const SessionToggleUseShirtSizes({required this.useShirtSizes});
+  const SessionUseShirtSizes({required this.useShirtSizes});
 
   @override
   List<Object> get props => [useShirtSizes];

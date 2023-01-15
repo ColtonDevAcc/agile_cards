@@ -7,8 +7,9 @@ class AgileCard extends StatelessWidget {
   final bool? isOwnersCard;
   final String measurement;
   final bool? isRevealed;
+  final Function(AnimationController)? cardController;
 
-  const AgileCard({Key? key, required this.measurement, this.participant, this.isOwnersCard, this.isRevealed}) : super(key: key);
+  const AgileCard({Key? key, required this.measurement, this.participant, this.cardController, this.isOwnersCard, this.isRevealed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

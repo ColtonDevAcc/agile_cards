@@ -26,31 +26,6 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
-    },
-    {
-      "name": "iphone_14_plus",
-      "request": "launch",
-      "type": "dart",
-      "deviceId": "9D564946-13BF-4239-8D4C-D3180733BFDD",
-      "flutterMode": "debug"
-    },
-    {
-      "name": "emulator-5556 (mobile)",
-      "request": "launch",
-      "type": "dart",
-      "deviceId": "emulator-5556"
-    },
-    {
-      "name": "chrome",
-      "request": "launch",
-      "type": "dart",
-      "deviceId": "chrome"
-    }
-  ],
-  "compounds": [
-    {
-      "name": "all devices",
-      "configurations": ["iphone_14_plus", "emulator-5556 (mobile)", "chrome"]
     }
   ]
 }
