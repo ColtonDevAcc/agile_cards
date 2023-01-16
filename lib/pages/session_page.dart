@@ -70,7 +70,7 @@ class SessionPage extends StatelessWidget {
                         const Text('You are not apart of a session'),
                         const SizedBox(height: 20),
                         PrimaryButton(
-                          onPressed: () => showModalBottomSheet(
+                          onPressed: () => showBottomSheet(
                             context: context,
                             builder: (context) => const CreateSessionBottomSheet(),
                             shape: const RoundedRectangleBorder(
@@ -104,7 +104,7 @@ class CreateSessionBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormBuilderState>();
     return Container(
-      height: MediaQuery.of(context).size.height * 1,
+      height: MediaQuery.of(context).size.height * .6,
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.only(
