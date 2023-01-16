@@ -13,20 +13,27 @@ class FlipCardButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SessionBloc, SessionState>(
       builder: (context, state) {
+        final bool isParticipating = state.session.participants?.any((element) => element.id == FirebaseAuth.instance.currentUser?.uid) ?? false;
         final bool cardsRevealed = state.session.cardsRevealed ?? false;
         final bool? ownerCardLockedIn = state.session.selections?.any((element) {
           return element.userId == FirebaseAuth.instance.currentUser?.uid && element.lockedIn == true;
         });
+        final bool sessionEmpty = state.session.participants != null && state.session.participants!.isEmpty;
 
-        return ownerCardLockedIn == null || ownerCardLockedIn
+        return !sessionEmpty && !isParticipating || (ownerCardLockedIn ?? false)
             ? PrimaryButton(
                 title: cardsRevealed == false ? 'Reveal' : 'Hide',
                 onPressed: () {
                   // ignore: avoid_bool_literals_in_conditional_expressions
-                  context.read<SessionBloc>().add(SessionRevealCards(reveal: cardsRevealed == false ? true : false));
+                  context.read<SessionBloc>().add(SessionToggleRevealCards(reveal: cardsRevealed == false ? true : false));
                 },
               )
-            : const SizedBox();
+            : isParticipating && (ownerCardLockedIn ?? false) == false
+                ? const SizedBox()
+                : const Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Text("Your session is not ready yet. Please wait for your participants to join.", textAlign: TextAlign.center),
+                  );
       },
     );
   }

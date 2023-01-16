@@ -15,7 +15,7 @@ class SessionOwnerView extends StatelessWidget {
         FlipCardButton(),
         SizedBox(height: 20),
         ParticipantCardSelectionList(),
-        Expanded(child: AgileCardSelector()),
+        AgileCardSelector(),
       ],
     );
   }

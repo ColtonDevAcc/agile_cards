@@ -20,17 +20,15 @@ class SessionFloatingActionButton extends StatelessWidget {
 
         return isEmpty || isOwner
             ? FloatingActionButton(
-                onPressed: !isOwner
-                    ? () => context.read<SessionBloc>().add(SessionCreated(context.read<AppBloc>().state.user!))
-                    : () {
-                        DynamicLinkService().buildDynamicLink(
-                          socialMediaTitle: 'Join my session',
-                          content: 'you can join my agile cards sessions with my code: ${state.session.id}',
-                          source: 'session_page',
-                          routeToContent: '/session/${state.session.id}',
-                          share: true,
-                        );
-                      },
+                onPressed: () {
+                  DynamicLinkService().buildDynamicLink(
+                    socialMediaTitle: 'Join my session',
+                    content: 'you can join my agile cards sessions with my code: ${state.session.id}',
+                    source: 'session_page',
+                    routeToContent: '/session/${state.session.id}',
+                    share: true,
+                  );
+                },
                 child: isOwner ? const Icon(Icons.send) : const SearchButton(),
               )
             : const SizedBox();

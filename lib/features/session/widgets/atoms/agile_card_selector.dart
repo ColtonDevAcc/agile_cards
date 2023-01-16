@@ -2,7 +2,6 @@ import 'package:agile_cards/app/models/selection_model.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
-import 'package:agile_cards/features/session/widgets/atoms/agile_card.dart';
 import 'package:agile_cards/features/session/widgets/atoms/flip_card_front.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,13 +17,13 @@ class AgileCardSelector extends StatelessWidget {
       builder: (context, state) {
         final Selection userSelection = state.session.selections!
             .firstWhere((element) => element.userId == FirebaseAuth.instance.currentUser?.uid, orElse: () => Selection.empty());
+        final bool isParticipant = state.session.participants!.any((element) => element.id == FirebaseAuth.instance.currentUser?.uid);
 
         final bool isShirtSizes = context.read<SessionBloc>().state.session.isShirtSizes ?? true;
-        return SizedBox(
-          width: double.infinity,
+        return Expanded(
           child: Column(
             children: [
-              if (userSelection.lockedIn == false)
+              if (userSelection.lockedIn == false && isParticipant)
                 Expanded(
                   child: StackedCardCarousel(
                     spaceBetweenItems: 200,
@@ -48,7 +47,7 @@ class AgileCardSelector extends StatelessWidget {
                     ],
                   ),
                 ),
-              if (context.read<SessionBloc>().state.session.cardsRevealed != true)
+              if (context.read<SessionBloc>().state.session.cardsRevealed != true && isParticipant)
                 TextButton(
                   onPressed: () => context.read<SessionBloc>().add(
                         SessionUpdateAgileCard(

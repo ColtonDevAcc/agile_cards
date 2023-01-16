@@ -7,6 +7,7 @@ part of 'participant_model.dart';
 // **************************************************************************
 
 Participant _$ParticipantFromJson(Map json) => Participant(
+      displayName: json['displayName'] as String?,
       id: json['id'] as String?,
       email: json['email'] as String?,
       name: json['name'] as String?,
@@ -24,6 +25,7 @@ const _$ParticipantFieldMap = <String, String>{
   'name': 'name',
   'shirtSize': 'shirtSize',
   'session': 'session',
+  'displayName': 'displayName',
 };
 
 Map<String, dynamic> _$ParticipantToJson(Participant instance) =>
@@ -35,4 +37,5 @@ Map<String, dynamic> _$ParticipantToJson(Participant instance) =>
       'name': instance.name,
       'shirtSize': instance.shirtSize,
       'session': instance.session,
+      'displayName': instance.displayName,
     };
