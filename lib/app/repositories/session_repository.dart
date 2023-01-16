@@ -43,6 +43,11 @@ class SessionRepository {
   Future<void> createSession(Session session) async {
     await FirebaseDatabase.instance.ref("sessions").child(session.id!).set(session.toDocument());
     final newRef = FirebaseDatabase.instance.ref("sessions/${session.id}");
+    if (session.participants != null && session.participants!.isNotEmpty) {
+      await newRef.child('participants').child(FirebaseAuth.instance.currentUser!.uid).set(
+            Participant.fromUser(FirebaseAuth.instance.currentUser!).toJson(),
+          );
+    }
 
     await subscribeToSession(ref: newRef);
   }

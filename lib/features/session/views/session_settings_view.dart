@@ -31,14 +31,14 @@ class SessionSettingsView extends StatelessWidget {
                 const SizedBox(height: 20, width: double.infinity),
                 PrimaryTextField(
                   width: double.infinity,
-                  onChanged: isOwner ? (s) => context.read<SessionBloc>().add(SessionNameChanged(s)) : (s) {},
+                  onChanged: isOwner ? (s) => context.read<SessionBloc>().add(SessionNameChanged(s ?? '')) : (s) {},
                   suffixIcon: isOwner ? Icons.edit : Icons.lock,
                   title: state.session.name,
                 ),
                 const SizedBox(height: 20),
                 PrimaryTextField(
                   width: double.infinity,
-                  onChanged: isOwner ? (s) => context.read<SessionBloc>().add(SessionDescriptionChanged(s)) : (s) {},
+                  onChanged: isOwner ? (s) => context.read<SessionBloc>().add(SessionDescriptionChanged(s ?? '')) : (s) {},
                   suffixIcon: isOwner ? Icons.edit : Icons.lock,
                   title: state.session.description,
                 ),

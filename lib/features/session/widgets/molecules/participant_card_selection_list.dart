@@ -16,8 +16,9 @@ class ParticipantCardSelectionList extends StatelessWidget {
       builder: (context, state) {
         final bool isParticipantLockedIn =
             state.session.selections?.any((element) => element.userId == FirebaseAuth.instance.currentUser!.uid && element.lockedIn == true) ?? true;
+        final bool isParticipating = state.session.participants?.any((element) => element.id == FirebaseAuth.instance.currentUser?.uid) ?? false;
 
-        return isParticipantLockedIn
+        return isParticipantLockedIn || !isParticipating
             ? Expanded(
                 flex: 10,
                 child: SizedBox(

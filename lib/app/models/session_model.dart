@@ -69,7 +69,7 @@ class Session extends Equatable {
   }
 
   int get selectionsNotLockedIn {
-    if (selections == null || selections!.isEmpty) return 0;
+    if (selections == null || selections!.isEmpty) return participants?.length ?? 0;
     return selections!.where((selection) => selection.lockedIn != true).length;
   }
 

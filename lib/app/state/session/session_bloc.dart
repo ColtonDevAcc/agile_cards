@@ -43,16 +43,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
 
   Future<void> _onSessionCreated(SessionCreated event, Emitter<SessionState> emit) async {
     try {
-      final Session session = Session(
-        id: FirebaseAuth.instance.currentUser!.uid,
-        name: 'unnamed',
-        description: 'no description',
-        owner: FirebaseAuth.instance.currentUser?.uid,
-        isShirtSizes: false,
-        participants: [Participant.fromUser(FirebaseAuth.instance.currentUser!)],
-      );
-
-      await sessionRepository.createSession(session);
+      await sessionRepository.createSession(event.session);
     } catch (e) {
       log(e.toString());
     }

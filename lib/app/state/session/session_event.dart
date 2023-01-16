@@ -10,7 +10,8 @@ abstract class SessionEvent extends Equatable {
 class SessionStarted extends SessionEvent {}
 
 class SessionCreated extends SessionEvent {
-  const SessionCreated();
+  final Session session;
+  const SessionCreated(this.session);
 
   @override
   List<Object> get props => [];
