@@ -14,8 +14,10 @@ class Participant extends Equatable {
   final String? name;
   final String? shirtSize;
   final String? session;
+  final String? displayName;
 
   const Participant({
+    this.displayName,
     this.id,
     this.email,
     this.name,
@@ -26,7 +28,7 @@ class Participant extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, name, imageUrl, email, phone, shirtSize, session];
+  List<Object?> get props => [id, name, imageUrl, email, phone, shirtSize, session, displayName];
 
   Participant copyWith({
     String? id,
@@ -36,6 +38,7 @@ class Participant extends Equatable {
     String? phone,
     String? shirtSize,
     String? session,
+    String? displayName,
   }) {
     return Participant(
       id: id ?? this.id,
@@ -45,6 +48,7 @@ class Participant extends Equatable {
       phone: phone ?? this.phone,
       shirtSize: shirtSize ?? this.shirtSize,
       session: session ?? this.session,
+      displayName: displayName ?? this.displayName,
     );
   }
 
@@ -76,17 +80,12 @@ class Participant extends Equatable {
       imageUrl: user.photoURL ?? '',
       email: user.email ?? '',
       phone: user.phoneNumber ?? '',
+      displayName: user.displayName ?? '',
     );
   }
 
   //empty factory
   factory Participant.empty() {
-    return const Participant(
-      id: '',
-      name: '',
-      imageUrl: '',
-      email: '',
-      phone: '',
-    );
+    return const Participant();
   }
 }

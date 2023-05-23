@@ -56,14 +56,14 @@ class LoginPage extends StatelessWidget {
                               children: [
                                 PrimaryTextField(
                                   title: 'Email',
-                                  onChanged: (v) => context.read<LoginCubit>().emailChanged(v),
+                                  onChanged: (v) => context.read<LoginCubit>().emailChanged(v ?? ''),
                                   keyboardType: TextInputType.emailAddress,
                                   autofillHints: const [AutofillHints.email],
                                 ),
                                 const SizedBox(height: 10),
                                 PrimaryTextField(
                                   title: 'Password',
-                                  onChanged: (v) => context.read<LoginCubit>().passwordChanged(v),
+                                  onChanged: (v) => context.read<LoginCubit>().passwordChanged(v ?? ''),
                                   obscureText: true,
                                   autofillHints: const [AutofillHints.password],
                                   keyboardType: TextInputType.visiblePassword,

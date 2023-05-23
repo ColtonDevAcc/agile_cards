@@ -19,7 +19,7 @@ class Session extends Equatable {
   final String? owner;
   final String? imageUrl;
   final bool? isShirtSizes;
-  final List<Map<String, Selection>>? selections;
+  final List<Selection>? selections;
 
   const Session({
     this.id,
@@ -44,7 +44,7 @@ class Session extends Equatable {
     String? owner,
     bool? isShirtSizes,
     List<Participant>? participants,
-    List<Map<String, Selection>>? selections,
+    List<Selection>? selections,
     bool? cardsRevealed,
   }) {
     return Session(
@@ -61,24 +61,22 @@ class Session extends Equatable {
   }
 
   String get sessionMeasurementAverage {
-    if (isShirtSizes ?? true) {
-      return tShirtSizes.length < sessionAverageValue ? tShirtSizes.last : tShirtSizes[sessionAverageValue];
-    } else {
+    if (isShirtSizes == false) {
       return taskSizes.length < sessionAverageValue ? taskSizes.last : taskSizes[sessionAverageValue];
+    } else {
+      return tShirtSizes.length < sessionAverageValue ? tShirtSizes.last : tShirtSizes[sessionAverageValue];
     }
   }
 
   int get selectionsNotLockedIn {
-    if (selections == null || selections!.isEmpty) return 0;
-    //return the number of selections.value that are not locked in
-    return selections!.where((selection) => selection.values.single.lockedIn != true).length;
+    if (selections == null || selections!.isEmpty) return participants?.length ?? 0;
+    return selections!.where((selection) => selection.lockedIn != true).length;
   }
 
   int get sessionAverageValue {
-    final List<Map<String, Selection>> selections = this.selections ?? [];
-    final List<int> values = selections.map((selection) => selection.values.single.cardSelected ?? 0).toList();
-    final int sum = values.reduce((value, element) => value);
-    return (sum / values.length).round();
+    final List<int> values = (selections ?? []).map((selection) => selection.cardSelected ?? 0).toList();
+    final int avg = (values.reduce((value, element) => value + element) / values.length).round();
+    return avg;
   }
 
   factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);
@@ -100,6 +98,11 @@ class Session extends Equatable {
   }
 
   factory Session.fromDocument(DataSnapshot snapshot) {
+    if (snapshot.value == null) {
+      log('Session.fromDocument: snapshot.value is null');
+      return Session.empty();
+    }
+
     // ignore: cast_nullable_to_non_nullable
     final Map<String, dynamic> document = Map<String, dynamic>.from(snapshot.value as Map);
     final selections = List<Map<String, Selection>>.from(
@@ -113,12 +116,15 @@ class Session extends Equatable {
       ).toList(),
     );
 
-    final participants = List<Participant>.from(
-      (document['participants'] as List).map(
-        (participant) {
-          return Participant.fromJson(Map<String, dynamic>.from(participant as Map));
+    final participants = List<Map<String, Participant>>.from(
+      (document['participants'] ?? {}).entries.map(
+        (entry) {
+          final Map<String, Participant> selection = {
+            entry.key: Participant.fromJson(Map<String, dynamic>.from(entry.value as Map)),
+          };
+          return selection;
         },
-      ),
+      ).toList(),
     );
 
     return Session(
@@ -128,9 +134,22 @@ class Session extends Equatable {
       imageUrl: document['imageUrl'],
       owner: document['owner'],
       isShirtSizes: document['isShirtSizes'],
-      selections: selections,
-      participants: participants,
+      selections: selections.map((selection) => selection.values.single).toList(),
+      participants: participants.map((participant) => participant.values.single).toList(),
       cardsRevealed: document['cardsRevealed'],
     );
+  }
+
+  Map<String, dynamic> toDocument() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'imageUrl': imageUrl,
+      'owner': owner,
+      'isShirtSizes': isShirtSizes,
+      'selections': selections?.map((selection) => {selections?.single.userId: selection.toJson()}).toList(),
+      'cardsRevealed': cardsRevealed,
+    };
   }
 }
