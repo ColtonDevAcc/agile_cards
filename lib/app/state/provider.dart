@@ -1,9 +1,10 @@
 import 'package:agile_cards/app/repositories/authentication_repository.dart';
 import 'package:agile_cards/app/repositories/session_repository.dart';
+import 'package:agile_cards/app/repositories/user_repository.dart';
 import 'package:agile_cards/app/state/app/app_bloc.dart';
+import 'package:agile_cards/app/state/profile/profile_bloc.dart';
 import 'package:agile_cards/app/state/session/session_bloc.dart';
 import 'package:agile_cards/features/login/cubit/login_cubit.dart';
-import 'package:agile_cards/features/session/cubits/agile_card/agile_card_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,6 +19,7 @@ class StateProviders extends StatelessWidget {
       providers: [
         RepositoryProvider(create: (context) => AuthenticationRepository()),
         RepositoryProvider(create: (context) => SessionRepository()),
+        RepositoryProvider(create: (context) => UserRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -31,8 +33,8 @@ class StateProviders extends StatelessWidget {
           BlocProvider<SessionBloc>(
             create: (BuildContext context) => SessionBloc(sessionRepository: context.read<SessionRepository>()),
           ),
-          BlocProvider<AgileCardCubit>(
-            create: (BuildContext context) => AgileCardCubit(),
+          BlocProvider<ProfileBloc>(
+            create: (BuildContext context) => ProfileBloc(userRepository: context.read<UserRepository>())..add(ProfileInitial()),
           ),
         ],
         child: child,

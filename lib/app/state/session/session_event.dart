@@ -10,11 +10,11 @@ abstract class SessionEvent extends Equatable {
 class SessionStarted extends SessionEvent {}
 
 class SessionCreated extends SessionEvent {
-  final Participant owner;
-  const SessionCreated(this.owner);
+  final Session session;
+  const SessionCreated(this.session);
 
   @override
-  List<Object> get props => [owner];
+  List<Object> get props => [];
 }
 
 class SessionSearched extends SessionEvent {
@@ -35,12 +35,10 @@ class SessionUpdated extends SessionEvent {
 }
 
 class SessionDeleted extends SessionEvent {
-  final Session session;
-
-  const SessionDeleted(this.session);
+  const SessionDeleted();
 
   @override
-  List<Object> get props => [session];
+  List<Object> get props => [];
 }
 
 class SessionLoaded extends SessionEvent {
@@ -61,7 +59,7 @@ class SessionJoined extends SessionEvent {
 }
 
 class SessionChanged extends SessionEvent {
-  final SessionStream session;
+  final Session session;
 
   const SessionChanged(this.session);
 
@@ -69,9 +67,9 @@ class SessionChanged extends SessionEvent {
   List<Object> get props => [session];
 }
 
-class SessionAgileCardSelected extends SessionEvent {
+class SessionUpdateAgileCard extends SessionEvent {
   final Selection selection;
-  const SessionAgileCardSelected(this.selection);
+  const SessionUpdateAgileCard(this.selection);
 
   @override
   List<Object> get props => [selection];
@@ -79,13 +77,6 @@ class SessionAgileCardSelected extends SessionEvent {
 
 class SessionLeave extends SessionEvent {
   const SessionLeave();
-
-  @override
-  List<Object> get props => [];
-}
-
-class SessionAgileCardDeselected extends SessionEvent {
-  const SessionAgileCardDeselected();
 
   @override
   List<Object> get props => [];
@@ -115,9 +106,9 @@ class SessionForceParticipantAdded extends SessionEvent {
   List<Object> get props => [participant];
 }
 
-class SessionRevealCards extends SessionEvent {
+class SessionToggleRevealCards extends SessionEvent {
   final bool reveal;
-  const SessionRevealCards({required this.reveal});
+  const SessionToggleRevealCards({required this.reveal});
 
   @override
   List<Object> get props => [reveal];
@@ -131,9 +122,9 @@ class SessionForceParticipantRemoved extends SessionEvent {
   List<Object> get props => [participant];
 }
 
-class SessionUseShirtSizes extends SessionEvent {
+class SessionToggleUseShirtSizes extends SessionEvent {
   final bool useShirtSizes;
-  const SessionUseShirtSizes({required this.useShirtSizes});
+  const SessionToggleUseShirtSizes({required this.useShirtSizes});
 
   @override
   List<Object> get props => [useShirtSizes];
